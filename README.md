@@ -2,7 +2,7 @@
 
 I thought I might use [MongoDB](https://www.mongodb.com/) and [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) to maybe make ineffectua.com and develop my knowledge of different tech a bit.
 
-Includes [material-UI](https://mui.com/)
+Includes [material-UI](https://mui.com/) which relies on [Emotion](https://emotion.sh/docs/introduction)
 
 ### Status
 

@@ -1,3 +1,4 @@
+import { List, ListItem } from '@mui/material';
 import { useRouter } from 'next/dist/client/router';
 import { useState } from 'react';
 import AddPost from '../common/components/posts/AddPost';
@@ -45,17 +46,22 @@ export default function Home({ posts } : { posts: IPostWithReplies[] }) {
             <div className={styles.screen} style={{ display: postChanging ? 'block' : 'none'}}>
               {/* screen for loading stuff */}
             </div>
-            {posts.map((post, index) => (
-              <Post
-                key={post._id ? (post._id as unknown) as string : `post_${index}`}
-                post={post}
-                onWillChange={() => setPostChanging(true)}
-                onChange={() => {
-                  setPostChanging(false);
-                  router.replace(router.asPath);
-                }}
-              />
-            ))}
+            <List aria-label="posts">
+              {posts.map((post, index) => (
+                <ListItem
+                  key={post._id ? (post._id as unknown) as string : `post_${index}`}
+                >
+                  <Post
+                    post={post}
+                    onWillChange={() => setPostChanging(true)}
+                    onChange={() => {
+                      setPostChanging(false);
+                      router.replace(router.asPath);
+                    }}
+                  />
+                </ListItem>
+              ))}
+            </List>
           </div>
         </div>
       </main>

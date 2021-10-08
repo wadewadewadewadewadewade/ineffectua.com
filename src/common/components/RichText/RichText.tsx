@@ -10,11 +10,16 @@ const Editor = dynamic<EditorProps>(
   { ssr: false }
 );
 
-export const RichText: React.FC<{
+interface IRichText extends Pick<EditorProps, 'wrapperStyle' | 'editorStyle' | 'toolbarStyle'> {
   onChange: (html: string) => void;
   defaultValue?: string;
   clearField?: boolean
-}> = ({
+}
+
+export const RichText: React.FC<IRichText> = ({
+  wrapperStyle,
+  editorStyle,
+  toolbarStyle,
   onChange,
   defaultValue,
   clearField
@@ -45,6 +50,9 @@ export const RichText: React.FC<{
   return (
     <>
       <Editor
+        wrapperStyle={wrapperStyle}
+        editorStyle={editorStyle}
+        toolbarStyle={toolbarStyle}
         editorState={editorState}
         onEditorStateChange={es => {
           setEditorState(es);

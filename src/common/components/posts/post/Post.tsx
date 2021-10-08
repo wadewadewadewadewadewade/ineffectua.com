@@ -3,6 +3,7 @@ import { IPostWithReplies } from '../../../types/IPost';
 import { Parser } from 'html-to-react';
 import fetchJson from '../../../utils/fetcher';
 import { UpdateResult } from 'mongodb';
+import { Button, Card, CardActions, CardContent, Typography } from '@mui/material';
 
 export const Post: React.FC<{
   post: IPostWithReplies,
@@ -24,19 +25,30 @@ export const Post: React.FC<{
     });
     onChange && onChange()
   };
-  return (
-  <div id={`post_${post._id}`}>
-    <time>{post.created}</time>
-    <div>
-      {post.body && new Parser().parse(post.body)}
-    </div>
-    <button onClick={e => {
-      e.preventDefault();
-      e.stopPropagation();
-      onDelete()
-    }} type="button">delete</button>
-  </div>
-)
-  };
+  return post.body ? (
+    <Card id={`post_${post._id}`}>
+      <CardContent>
+        <Typography color="text.secondary" gutterBottom component="time">
+          {post.created}
+        </Typography>
+        <Typography gutterBottom component="div">
+          {new Parser().parse(post.body)}
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete()
+          }}
+          type="button"
+        >
+          delete
+        </Button>
+      </CardActions>
+    </Card>
+  ) : null
+};
 
 export default Post;
