@@ -4,4 +4,4 @@ I thought I might use [MongoDB](https://www.mongodb.com/) and [`create-next-app`
 
 ### Status
 
-`2021-10-08`: This is merely a sandbox I've only just started
+- `2021-10-08`: This is merely a sandbox I've only just started
