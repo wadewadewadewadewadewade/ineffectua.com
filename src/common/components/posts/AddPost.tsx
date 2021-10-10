@@ -4,22 +4,9 @@ import RichText from '../RichText/RichText';
 import fetchJson from '../../utils/fetcher';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PostMasonry from './PostMasonry';
-import { styled } from '@mui/material/styles';
-import IconButton from '@mui/material/IconButton';
-import { Button, Typography, Card, CardActions, CardContent, Collapse, IconButtonProps, Badge } from '@mui/material';
-import styles from './AddPost.module.scss';
+import { Box, Button, Typography, Card, CardActions, CardContent, Collapse, Toolbar, Fade, CircularProgress } from '@mui/material';
 import { IPostWithReplies } from '../../types/IPost';
-
-const ExpandMore = styled((props: { expand: boolean } & IconButtonProps) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
+import ExpandMore from '../ExpandMore';
 
 interface IFormData {
   body: string;
@@ -28,7 +15,7 @@ interface IFormData {
 interface IAddPost {
   replies?: IPostWithReplies[]
   onWillPost?: () => void
-  onPost?: () => void
+  onPost?: (newPost: IPostWithReplies) => void
 }
 
 export const AddPost: React.FC<IAddPost> = ({
@@ -53,7 +40,7 @@ export const AddPost: React.FC<IAddPost> = ({
     }
     onWillPost && onWillPost();
     setIsLoading(true);
-    const newPost = await fetchJson('/api/posts', {
+    const newPost: IPostWithReplies = await fetchJson('/api/posts', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -63,33 +50,46 @@ export const AddPost: React.FC<IAddPost> = ({
     });
     setIsLoading(false);
     setShowReplies(true);
-    onPost && onPost();
+    onPost && onPost(newPost);
   };
   return (
     <Card>
-      <CardContent>
-        <div className={styles.screenContainer}>
-          <div className={styles.screen} style={{ display: isLoading ? 'block' : 'none'}}></div>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Typography gutterBottom variant="h5" component="div">
-              Add Post
-            </Typography>
-            <RichText
-              onChange={html => setBody(html)}
-              clearField={isLoading}
-            />
-          </form>
-        </div>
+      <CardContent sx={{ position: 'relative' }}>
+        <Fade
+          in={isLoading}
+          style={{
+            transitionDelay: isLoading ? '800ms' : '0ms',
+          }}
+          unmountOnExit
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', zIndex: 2, top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.125)' }}>
+            <CircularProgress />
+          </Box>
+        </Fade>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Typography gutterBottom variant="h5" component="div">
+            Add Post
+          </Typography>
+          <RichText
+            onChange={html => setBody(html)}
+            clearField={isLoading}
+          />
+        </form>
       </CardContent>
       <CardActions>
-        <Button onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          onSubmit({ body });
-        }}>
-          Post
-        </Button>
-        <Badge badgeContent={(replies || []).length} color="primary">
+        <Toolbar sx={{ flexGrow: 1, paddingLeft: 1, paddingRight: 1 }} disableGutters>
+          <Button
+            disabled={isLoading}
+            variant="contained"
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              onSubmit({ body });
+            }}
+          >
+            Post
+          </Button>
+          <Box sx={{ display: 'flex', flexGrow: 1 }}></Box>
           <ExpandMore
             expand={showReplies}
             onClick={() => setShowReplies(prevState => !prevState)}
@@ -98,7 +98,7 @@ export const AddPost: React.FC<IAddPost> = ({
           >
             <ExpandMoreIcon />
           </ExpandMore>
-        </Badge>
+        </Toolbar>
       </CardActions>
       <Collapse in={showReplies} timeout="auto" sx={{ paddingLeft: 1, paddingRight: 1 }}>
         <PostMasonry posts={replies || []} />

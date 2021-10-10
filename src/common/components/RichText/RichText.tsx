@@ -37,7 +37,7 @@ export const RichText: React.FC<IRichText> = ({
   };
   const [editorState, setEditorState] = useState<EditorState>();
   const clearEditorState = () => setEditorState(es =>
-    EditorState.push(
+    es && EditorState.push(
       es,
       ContentState.createFromText(''),
       'change-block-data'
