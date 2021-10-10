@@ -5,11 +5,13 @@ import fetchJson from '../../../utils/fetcher';
 import { UpdateResult } from 'mongodb';
 import { Button, Card, CardActions, CardContent, Typography } from '@mui/material';
 
-export const Post: React.FC<{
+export interface IPostProps {
   post: IPostWithReplies,
   onWillChange?: () => void,
   onChange?: () => void
-}> = ({
+}
+
+export const Post: React.FC<IPostProps> = ({
   post,
   onWillChange,
   onChange
