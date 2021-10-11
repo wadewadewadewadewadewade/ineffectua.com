@@ -9,7 +9,7 @@ if (!process.env.MONGODB_DB) {
   throw new Error('Please add your Mongo DB to .env.local');
 }
 
-const client = new MongoClient(process.env.MONGODB_URI);
+const client = new MongoClient(process.env.MONGODB_URI) as MongoClient & { isConnected: boolean };
 
 export interface INextApiRequestWithDB extends NextApiRequest {
   dbClient: MongoClient,
@@ -21,7 +21,6 @@ async function database(
   res: NextApiResponse,
   next: NextHandler
 ) {
-  // @ts-ignore isConnected actually does exist and is missing from types
   if (!client.isConnected) await client.connect();
   req.dbClient = client;
   req.db = client.db(process.env.MONGODB_DB);

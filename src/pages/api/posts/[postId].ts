@@ -25,20 +25,24 @@ handler.get(async (req, res) => {
   const replies: Promise<void>[] = [];
   posts.forEach(post => replies.push(
     new Promise<void>(
-      async (response,reject) => {
+      (response,reject) => {
         try {
-          post.replies = await req.db
+          req.db
             .collection<IPost>("posts")
             .find({
               deleted: undefined,
               replyTo: new ObjectId(postId)
             }, PostProjection)
             .sort({ created: -1 })
-            .toArray();
+            .toArray()
+            .then(replies => {
+              post.replies = replies;
+              response();
+            })
+            .catch(reject);
         } catch (ex) {
           reject(ex);
         }
-        response();
       }
     )
   ));

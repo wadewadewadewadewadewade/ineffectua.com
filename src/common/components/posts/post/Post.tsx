@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { IPostWithReplies } from '../../../types/IPost';
 import { Parser } from 'html-to-react';
 import fetchJson from '../../../utils/fetcher';
-import { UpdateResult } from 'mongodb';
-import { Box, Button, Card, CardActions, CardContent, Collapse, CircularProgress, Fade, Toolbar, Typography, TypographyProps } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Collapse, CircularProgress, Fade, Toolbar, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddPost from '../AddPost';
 import ExpandMore from '../../ExpandMore';
 import { styled } from '@mui/material/styles';
 
-const StyledTypography = styled(Typography)(({ theme }) => ({
+const StyledTypography = styled(Typography)(() => ({
   'img': {
     maxWidth: '100%'
   }
@@ -27,7 +26,7 @@ export const Post: React.FC<IPostProps> = ({
   const [showReplies, setShowReplies] = useState(false);
   const onDelete = async () => {
     setIsLoading(true);
-    const result: UpdateResult = await fetchJson(`/api/posts/${post._id}`, {
+    await fetchJson(`/api/posts/${post._id}`, {
       method: 'DELETE',
       headers: {
         Accept: 'application/json',

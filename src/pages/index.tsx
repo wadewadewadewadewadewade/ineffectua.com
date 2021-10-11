@@ -1,5 +1,5 @@
+import React from 'react';
 import { useRouter } from 'next/dist/client/router';
-import { useState } from 'react';
 import AddPost from '../common/components/posts/AddPost';
 import { IPostWithReplies } from '../common/types/IPost';
 import fetchJson from '../common/utils/fetcher';

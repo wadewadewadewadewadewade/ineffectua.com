@@ -28,7 +28,7 @@ const handler = nextConnect<
   NextApiResponse
 >();
 
-var s3Client = new AWS.S3({
+const s3Client = new AWS.S3({
   accessKeyId: process.env.AWS_S3_KEY,
   secretAccessKey: process.env.AWS_S3_SECRET
   // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
