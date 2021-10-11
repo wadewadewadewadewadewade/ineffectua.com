@@ -47,7 +47,7 @@ handler.post(async (req, res) => {
           ACL: 'public-read',
           Body: part,
           ContentLength: part.byteCount
-        }, function(err, data) {
+        }, function(err) {
           if (err) {
             boo(err);
           } else {
