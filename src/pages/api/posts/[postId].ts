@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from 'next';
 import middleware, { INextApiRequestWithDB } from '../../../common/utils/mongodb';
-import { ObjectId } from "mongodb";
-import { IPost, PostProjection } from "../../../common/models/posts/post";
-import { IPostWithReplies } from "../../../common/types/IPost";
-import nextConnect, { NextConnect } from "next-connect";
+import { ObjectId } from 'mongodb';
+import { IPost, PostProjection } from '../../../common/models/posts/post';
+import { IPostWithReplies } from '../../../common/types/IPost';
+import nextConnect from 'next-connect';
 
 const handler = nextConnect<
   INextApiRequestWithDB,

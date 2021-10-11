@@ -1,6 +1,6 @@
 import { NextApiResponse } from "next";
 import middleware, { INextApiRequestWithDB } from '../../common/utils/mongodb';
-import nextConnect from "next-connect";
+import nextConnect from 'next-connect';
 import { IPost, PostProjection } from "../../common/models/posts/post";
 
 const handler = nextConnect<
@@ -27,7 +27,7 @@ handler.post(async (req, res) => {
   const newPost: IPost = { inReplyTo, created, body };
   const result = await req.db
     .collection<IPost>("posts")
-    .insertOne(newPost);
+    .insertOne(newPost); // TODO: also index images and clean-up unused images
   newPost._id = result.insertedId;
   res.json(newPost);
 })

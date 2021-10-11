@@ -3,10 +3,17 @@ import { IPostWithReplies } from '../../../types/IPost';
 import { Parser } from 'html-to-react';
 import fetchJson from '../../../utils/fetcher';
 import { UpdateResult } from 'mongodb';
-import { Box, Button, Card, CardActions, CardContent, Collapse, CircularProgress, Fade, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Collapse, CircularProgress, Fade, Toolbar, Typography, TypographyProps } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddPost from '../AddPost';
 import ExpandMore from '../../ExpandMore';
+import { styled } from '@mui/material/styles';
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  'img': {
+    maxWidth: '100%'
+  }
+}));
 
 export interface IPostProps {
   post: IPostWithReplies,
@@ -46,9 +53,9 @@ export const Post: React.FC<IPostProps> = ({
         <Typography color="text.secondary" gutterBottom component="time">
           {post.created}
         </Typography>
-        <Typography gutterBottom component="div">
+        <StyledTypography gutterBottom>
           {new Parser().parse(post.body)}
-        </Typography>
+        </StyledTypography>
       </CardContent>
       <CardActions>
         <Toolbar sx={{ flexGrow: 1, paddingLeft: 1, paddingRight: 1 }} disableGutters>

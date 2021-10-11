@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { IPost } from '../../models/posts/post';
 import RichText from '../RichText/RichText';
 import fetchJson from '../../utils/fetcher';
@@ -26,6 +26,7 @@ export const AddPost: React.FC<IAddPost> = ({
   const [body, setBody] = useState<string>();
   const [showReplies, setShowReplies] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const imagesRef = useRef<string[]>([]);
   const handleSubmit: (method: (data: IFormData) => void) => React.FormEventHandler<HTMLFormElement> = method => {
     return e => {
       e.preventDefault();
@@ -40,6 +41,26 @@ export const AddPost: React.FC<IAddPost> = ({
     }
     onWillPost && onWillPost();
     setIsLoading(true);
+    // remove unused images
+    if (Array.isArray(imagesRef.current)) {
+      const imagesToRemove = [];
+      imagesRef.current.forEach(imageUrl => {
+        if (!data.body.includes(imageUrl)) {
+          imagesToRemove.push(imageUrl);
+        }
+      });
+      if (imagesToRemove.length > 0) {
+        await fetchJson('/api/images', {
+          method: 'DELETE',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(imagesToRemove)
+        })
+      }
+    }
+    // then post
     const newPost: IPostWithReplies = await fetchJson('/api/posts', {
       method: 'POST',
       headers: {
@@ -53,7 +74,7 @@ export const AddPost: React.FC<IAddPost> = ({
     onPost && onPost(newPost);
   };
   return (
-    <Card>
+    <Card sx={{ overflow: 'visible' }}>
       <CardContent sx={{ position: 'relative' }}>
         <Fade
           in={isLoading}
@@ -73,6 +94,11 @@ export const AddPost: React.FC<IAddPost> = ({
           <RichText
             onChange={html => setBody(html)}
             clearField={isLoading}
+            onImageUploaded={imageUrl =>
+              Array.isArray(imagesRef.current)
+                ? imagesRef.current.push(imageUrl)
+                : imagesRef.current = [imageUrl]
+            }
           />
         </form>
       </CardContent>
