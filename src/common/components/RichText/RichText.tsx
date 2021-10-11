@@ -4,20 +4,12 @@ import { ContentState, convertFromHTML, EditorState, convertToRaw } from 'draft-
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { EditorProps } from 'react-draft-wysiwyg';
-import { makeStyles } from '@mui/styles';
 
 const Editor = dynamic<EditorProps>(
   () => import('react-draft-wysiwyg').then((mod) => mod.Editor),
   { ssr: false }
 );
 
-export const richTextStyles = makeStyles({
-  images: {
-    'img': {
-      maxWidth: '100%'
-    }
-  }
-})
 interface IRichText extends Pick<EditorProps, 'wrapperStyle' | 'editorStyle' | 'toolbarStyle'> {
   onChange: (html: string) => void;
   defaultValue?: string;
@@ -75,9 +67,8 @@ export const RichText: React.FC<IRichText> = ({
       link: imgData
     }});
   }
-  const classes = richTextStyles();
   return (
-    <div className={classes.images}>
+    <>
       <Editor
         wrapperStyle={wrapperStyle}
         editorStyle={editorStyle}
@@ -103,7 +94,7 @@ export const RichText: React.FC<IRichText> = ({
           },
         }}
       />
-    </div>
+    </>
   )
 }
 

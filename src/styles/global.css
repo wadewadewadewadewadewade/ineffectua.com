@@ -10,3 +10,8 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* for image support in react-draft-wysiwyg */
+.rdw-image-imagewrapper img {
+  max-width: 100%;
+}

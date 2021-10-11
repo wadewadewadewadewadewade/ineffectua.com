@@ -35,6 +35,10 @@ export const AddPost: React.FC<IAddPost> = ({
     }
   }
   const onSubmit = async (data: IFormData) => {
+    // ignore submissions with no body
+    if (!data.body || data.body.length < 1) {
+      return;
+    }
     const updatedData: IPost = {
       ...data,
       created: new Date(Date.now()).toLocaleString('en-US')
@@ -83,7 +87,7 @@ export const AddPost: React.FC<IAddPost> = ({
           }}
           unmountOnExit
         >
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', zIndex: 2, top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.125)' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', zIndex: 3, top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.125)' }}>
             <CircularProgress />
           </Box>
         </Fade>
