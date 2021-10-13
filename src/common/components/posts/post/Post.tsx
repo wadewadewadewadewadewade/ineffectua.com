@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IPostWithReplies } from '../../../types/IPost';
 import { Parser } from 'html-to-react';
-import fetchJson from '../../../utils/fetcher';
+import fetchJson, { EApiEndpoints } from '../../../utils/fetcher';
 import { Box, Button, Card, CardActions, CardContent, Collapse, CircularProgress, Fade, Toolbar, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddPost from '../AddPost';
@@ -26,13 +26,7 @@ export const Post: React.FC<IPostProps> = ({
   const [showReplies, setShowReplies] = useState(false);
   const onDelete = async () => {
     setIsLoading(true);
-    await fetchJson(`/api/posts/${post._id}`, {
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-    });
+    await fetchJson('DELETE', EApiEndpoints.POST, post._id.toString());
     setIsLoading(false);
   };
   return post.body ? (

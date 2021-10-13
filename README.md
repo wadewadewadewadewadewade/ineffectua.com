@@ -6,5 +6,6 @@ Includes [Material-UI](https://mui.com/) which relies on [Emotion](https://emoti
 
 ### Status
 
+- `2021-10-12`: Working on adding user support via Userfront, but have two questions for userfront support: how do I create a user via the API and set that user's password, and how do I get localhost:3000 to be authorized to make requests?
 - `2021-10-11`: Added image support via AWS S3
 - `2021-10-08`: This is merely a sandbox I've only just started

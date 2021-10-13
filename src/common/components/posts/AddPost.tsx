@@ -1,12 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { IPost } from '../../models/posts/post';
 import RichText from '../RichText/RichText';
-import fetchJson from '../../utils/fetcher';
+import fetchJson, { EApiEndpoints } from '../../utils/fetcher';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PostMasonry from './PostMasonry';
 import { Box, Button, Typography, Card, CardActions, CardContent, Collapse, Toolbar, Fade, CircularProgress } from '@mui/material';
 import { IPostWithReplies } from '../../types/IPost';
 import ExpandMore from '../ExpandMore';
+import UserfrontAuthenticationContext from '../../context/UserfrontAuthenticationContext';
 
 interface IFormData {
   body: string;
@@ -23,6 +24,8 @@ export const AddPost: React.FC<IAddPost> = ({
   onWillPost,
   onPost
 }) => {
+  const userfrontAuthentication = useContext(UserfrontAuthenticationContext);
+  const user = 'userId' in userfrontAuthentication ? userfrontAuthentication : undefined;
   const [body, setBody] = useState<string>();
   const [showReplies, setShowReplies] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -41,6 +44,12 @@ export const AddPost: React.FC<IAddPost> = ({
     }
     const updatedData: IPost = {
       ...data,
+      authorId: user?.userId,
+      author: {
+        userId: user?.userId,
+        name: '',
+        image: ''
+      },
       created: new Date(Date.now()).toLocaleString('en-US')
     }
     onWillPost && onWillPost();
@@ -54,7 +63,7 @@ export const AddPost: React.FC<IAddPost> = ({
         }
       });
       if (imagesToRemove.length > 0) {
-        await fetchJson('/api/images', {
+        await fetch('/api/images', {
           method: 'DELETE',
           headers: {
             Accept: 'application/json',
@@ -65,13 +74,9 @@ export const AddPost: React.FC<IAddPost> = ({
       }
     }
     // then post
-    const newPost: IPostWithReplies = await fetchJson('/api/posts', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updatedData)
+    const newPost: IPostWithReplies = await fetchJson('POST', EApiEndpoints.POSTS, undefined, JSON.stringify(updatedData), {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
     });
     setIsLoading(false);
     setShowReplies(true);

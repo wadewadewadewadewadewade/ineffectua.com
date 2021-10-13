@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import AddPost from '../common/components/posts/AddPost';
 import { IPostWithReplies } from '../common/types/IPost';
-import fetchJson from '../common/utils/fetcher';
+import fetchJson, { EApiEndpoints } from '../common/utils/fetcher';
 import styles from '../styles/pages/index.module.scss';
+import UserfrontAuthenticationContext from '../common/context/UserfrontAuthenticationContext';
+import { Authentication } from '../common/components/users/Authentication';
 
 export async function getServerSideProps() {
   const [posts] = await Promise.all([
-    fetchJson(`http://localhost:3000/api/posts`)
+    fetchJson('GET', EApiEndpoints.POSTS)
   ]);
   return {
     props: {
@@ -19,6 +21,7 @@ export async function getServerSideProps() {
 
 export default function Home({ posts } : { posts: IPostWithReplies[] }) {
   const router = useRouter();
+  const userfrontAuthentication = useContext(UserfrontAuthenticationContext);
   return (
     <div className={styles.container}>
 
@@ -27,13 +30,19 @@ export default function Home({ posts } : { posts: IPostWithReplies[] }) {
           Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
         </h1>
 
-        <h2 className="subtitle">Posts</h2>
-        <AddPost
-          onPost={() => {
-            router.replace(router.asPath);
-          }}
-          replies={posts}
-        />
+        {'userId' in userfrontAuthentication ? (
+          <>
+            <h2 className="subtitle">Posts</h2>
+            <AddPost
+              onPost={() => {
+                router.replace(router.asPath);
+              }}
+              replies={posts}
+            />
+          </>
+        ) : (
+          <Authentication />
+        )}
       </main>
 
       <footer className={styles.footer}>
