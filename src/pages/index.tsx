@@ -1,27 +1,30 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useRouter } from 'next/dist/client/router';
 import AddPost from '../common/components/posts/AddPost';
 import { IPostWithReplies } from '../common/types/IPost';
 import fetchJson, { EApiEndpoints } from '../common/utils/fetcher';
 import styles from '../styles/pages/index.module.scss';
-import UserfrontAuthenticationContext from '../common/context/UserfrontAuthenticationContext';
 import { Authentication } from '../common/components/users/Authentication';
+import { IUser } from '../common/models/users/user';
 
 export async function getServerSideProps() {
-  const [posts] = await Promise.all([
+  const [user, posts] = await Promise.all([
+    new Promise<IUser | false>((res) => fetch('http://localhost:3000/api/auth').then(response => {
+      response.json().then(user => res(user));
+    }).catch(() => res(false))),
     fetchJson('GET', EApiEndpoints.POSTS)
   ]);
   return {
     props: {
       posts,
+      user,
       fallback: 'blocking'
     }
   };
 }
 
-export default function Home({ posts } : { posts: IPostWithReplies[] }) {
+export default function Home({ posts, user } : { posts: IPostWithReplies[], user?: IUser }) {
   const router = useRouter();
-  const userfrontAuthentication = useContext(UserfrontAuthenticationContext);
   return (
     <div className={styles.container}>
 
@@ -30,7 +33,7 @@ export default function Home({ posts } : { posts: IPostWithReplies[] }) {
           Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
         </h1>
 
-        {'userId' in userfrontAuthentication ? (
+        {user ? (
           <>
             <h2 className="subtitle">Posts</h2>
             <AddPost

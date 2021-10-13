@@ -1,27 +1,20 @@
-export interface IUser {
-  mode: 'test' | 'live',
-  userId: number,
-  tenantId: string,
-  uuid: string,
-  username: string,
-  email: string,
-  name: string,
-  image: string,
-  locked: boolean,
-  data: Record<string, any>,
-  isConfirmed: boolean,
-  lastActiveAt: string,
-  lastMessagedAt: string,
-  confirmedAt: string,
-  updatedAt: string,
-  createdAt: string,
-  tenant: {
-    tenantId: string,
-    name: string
-  },
-  authorization: {
-    [tenantId: string]: {
-      roles: string[]
-    }
-  }
+import { UserProfile } from "@auth0/nextjs-auth0";
+import { FindOptions  } from 'mongodb';
+
+const UserProjectionRecord: Record<keyof IUser, 0 | 1> = {
+  _id: 1,
+  email: 1,
+  email_verified: 1,
+  name: 1,
+  nickname: 1,
+  picture: 1,
+  sub: 1,
+  updated_at: 1,
+  org_id: 1
+}
+
+export const UserProjection = UserProjectionRecord as FindOptions<IUser>;
+
+export interface IUser extends UserProfile {
+  _id: string;
 }
