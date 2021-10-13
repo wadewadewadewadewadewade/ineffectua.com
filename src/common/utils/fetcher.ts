@@ -2,7 +2,7 @@ export enum EApiEndpoints {
   USERS = 'users',
   USER = 'users/',
   POSTS = 'posts',
-  POST = 'posts/'
+  POST = 'posts/',
 }
 
 const fetcher = async (
@@ -12,8 +12,8 @@ const fetcher = async (
   body?: BodyInit,
   headers: HeadersInit = {
     Accept: 'application/json',
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 ) => {
   let url = `http://localhost:3000/api/${endpoint}`;
   if (endpoint === EApiEndpoints.POST && !!params) {
@@ -22,7 +22,7 @@ const fetcher = async (
   const response = await fetch(url, {
     method,
     ...(headers ? { headers } : {}),
-    body
+    body,
   });
   if (response.ok) {
     if ('Accept' in headers && headers.Accept === 'application/json') {
@@ -33,6 +33,6 @@ const fetcher = async (
   }
   const error = new Error(response.statusText);
   throw error;
-}
+};
 
 export default fetcher;

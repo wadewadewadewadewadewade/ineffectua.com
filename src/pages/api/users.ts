@@ -1,8 +1,12 @@
-import { NextApiResponse } from "next";
+import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
-import auth0, { createUser, getUser, INextApiRequestWithUser } from "../../common/utils/auth0";
-import { UserProfile } from "@auth0/nextjs-auth0";
+import auth0, {
+  createUser,
+  getUser,
+  INextApiRequestWithUser,
+} from '../../common/utils/auth0';
+import { UserProfile } from '@auth0/nextjs-auth0';
 
 const handler = nextConnect<
   INextApiRequestWithDB & INextApiRequestWithUser,
@@ -21,5 +25,5 @@ handler.post(async (req, res) => {
   const user = await createUser(req.db, userData);
   res.status(200).json(user);
 });
-  
+
 export default handler;

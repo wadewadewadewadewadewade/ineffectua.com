@@ -8,12 +8,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       <UserProvider>
         <Component {...pageProps} />
       </UserProvider>
     </>
-  )
+  );
 }
-export default MyApp
+export default MyApp;

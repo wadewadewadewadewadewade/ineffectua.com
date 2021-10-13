@@ -1,12 +1,9 @@
-import { NextApiResponse } from "next";
+import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
-import { getUser } from "../../../common/utils/auth0";
-import mongodb, { INextApiRequestWithDB } from "../../../common/utils/mongodb";
+import { getUser } from '../../../common/utils/auth0';
+import mongodb, { INextApiRequestWithDB } from '../../../common/utils/mongodb';
 
-const handler = nextConnect<
-  INextApiRequestWithDB,
-  NextApiResponse
->();
+const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
 handler.use(mongodb);
 
 handler.get(async (req, res) => {
@@ -19,5 +16,5 @@ handler.get(async (req, res) => {
     }
   }
 });
-  
+
 export default handler;

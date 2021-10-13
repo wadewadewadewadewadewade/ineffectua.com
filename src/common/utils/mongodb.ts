@@ -9,17 +9,19 @@ if (!process.env.MONGODB_DB) {
   throw new Error('Please add your Mongo DB to .env.local');
 }
 
-const client = new MongoClient(process.env.MONGODB_URI) as MongoClient & { isConnected: boolean };
+const client = new MongoClient(process.env.MONGODB_URI) as MongoClient & {
+  isConnected: boolean;
+};
 
 export interface INextApiRequestWithDB extends NextApiRequest {
-  dbClient: MongoClient,
-  db: Db
+  dbClient: MongoClient;
+  db: Db;
 }
 
 async function database(
   req: INextApiRequestWithDB,
   res: NextApiResponse,
-  next: NextHandler
+  next: NextHandler,
 ) {
   if (!client.isConnected) await client.connect();
   req.dbClient = client;

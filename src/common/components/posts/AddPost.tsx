@@ -3,7 +3,18 @@ import RichText from '../RichText/RichText';
 import fetchJson, { EApiEndpoints } from '../../utils/fetcher';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PostMasonry from './PostMasonry';
-import { Box, Button, Typography, Card, CardActions, CardContent, Collapse, Toolbar, Fade, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  Card,
+  CardActions,
+  CardContent,
+  Collapse,
+  Toolbar,
+  Fade,
+  CircularProgress,
+} from '@mui/material';
 import { IPostWithReplies } from '../../types/IPost';
 import ExpandMore from '../ExpandMore';
 import { useUser } from '@auth0/nextjs-auth0';
@@ -13,28 +24,30 @@ interface IFormData {
 }
 
 interface IAddPost {
-  replies?: IPostWithReplies[]
-  onWillPost?: () => void
-  onPost?: (newPost: IPostWithReplies) => void
+  replies?: IPostWithReplies[];
+  onWillPost?: () => void;
+  onPost?: (newPost: IPostWithReplies) => void;
 }
 
 export const AddPost: React.FC<IAddPost> = ({
   replies,
   onWillPost,
-  onPost
+  onPost,
 }) => {
   const { user, error, isLoading: isUserLoading } = useUser();
   const [body, setBody] = useState<string>();
   const [showReplies, setShowReplies] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const imagesRef = useRef<string[]>([]);
-  const handleSubmit: (method: (data: IFormData) => void) => React.FormEventHandler<HTMLFormElement> = method => {
+  const handleSubmit: (
+    method: (data: IFormData) => void,
+  ) => React.FormEventHandler<HTMLFormElement> = method => {
     return e => {
       e.preventDefault();
       e.stopPropagation();
       method({ body });
-    }
-  }
+    };
+  };
   const onSubmit = async (data: IFormData) => {
     // ignore submissions with no body
     if (!data.body || data.body.length < 1) {
@@ -55,17 +68,23 @@ export const AddPost: React.FC<IAddPost> = ({
           method: 'DELETE',
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(imagesToRemove)
-        })
+          body: JSON.stringify(imagesToRemove),
+        });
       }
     }
     // then post
-    const newPost: IPostWithReplies = await fetchJson('POST', EApiEndpoints.POSTS, undefined, JSON.stringify(data), {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    });
+    const newPost: IPostWithReplies = await fetchJson(
+      'POST',
+      EApiEndpoints.POSTS,
+      undefined,
+      JSON.stringify(data),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    );
     setIsLoading(false);
     setShowReplies(true);
     onPost && onPost(newPost);
@@ -74,7 +93,7 @@ export const AddPost: React.FC<IAddPost> = ({
     return null;
   }
   if (error) {
-    console.error(error)
+    console.error(error);
     throw error;
   }
   return (
@@ -87,12 +106,25 @@ export const AddPost: React.FC<IAddPost> = ({
           }}
           unmountOnExit
         >
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', zIndex: 3, top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.125)' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              zIndex: 3,
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0,0,0,0.125)',
+            }}
+          >
             <CircularProgress />
           </Box>
         </Fade>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant='h5' component='div'>
             Add Post
           </Typography>
           <RichText
@@ -101,16 +133,19 @@ export const AddPost: React.FC<IAddPost> = ({
             onImageUploaded={imageUrl =>
               Array.isArray(imagesRef.current)
                 ? imagesRef.current.push(imageUrl)
-                : imagesRef.current = [imageUrl]
+                : (imagesRef.current = [imageUrl])
             }
           />
         </form>
       </CardContent>
       <CardActions>
-        <Toolbar sx={{ flexGrow: 1, paddingLeft: 1, paddingRight: 1 }} disableGutters>
+        <Toolbar
+          sx={{ flexGrow: 1, paddingLeft: 1, paddingRight: 1 }}
+          disableGutters
+        >
           <Button
             disabled={isLoading}
-            variant="contained"
+            variant='contained'
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
@@ -124,17 +159,21 @@ export const AddPost: React.FC<IAddPost> = ({
             expand={showReplies}
             onClick={() => setShowReplies(prevState => !prevState)}
             aria-expanded={showReplies}
-            aria-label="see replies"
+            aria-label='see replies'
           >
             <ExpandMoreIcon />
           </ExpandMore>
         </Toolbar>
       </CardActions>
-      <Collapse in={showReplies} timeout="auto" sx={{ paddingLeft: 1, paddingRight: 1 }}>
+      <Collapse
+        in={showReplies}
+        timeout='auto'
+        sx={{ paddingLeft: 1, paddingRight: 1 }}
+      >
         <PostMasonry posts={replies || []} />
       </Collapse>
     </Card>
-  )
+  );
 };
 
 export default AddPost;

@@ -1,5 +1,5 @@
-import { FindOptions, ObjectId } from "mongodb";
-import { IUser } from "../users/user";
+import { FindOptions, ObjectId } from 'mongodb';
+import { IUser } from '../users/user';
 
 const PostProjectionRecord: Record<keyof IPost, 0 | 1> = {
   _id: 1,
@@ -7,8 +7,8 @@ const PostProjectionRecord: Record<keyof IPost, 0 | 1> = {
   inReplyTo: 1,
   created: 1,
   deleted: 0,
-  body: 1
-}
+  body: 1,
+};
 
 export interface IPost {
   _id: string;

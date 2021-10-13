@@ -7,12 +7,10 @@ import Post from './post/Post';
 import { useMediaQuery } from '@mui/material';
 
 interface IPostMasonry {
-  posts: IPostWithReplies[],
+  posts: IPostWithReplies[];
 }
 
-export const PostMasonry: React.FC<IPostMasonry> = ({
-  posts
-}) => {
+export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
   const theme = useTheme();
 
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
@@ -36,20 +34,14 @@ export const PostMasonry: React.FC<IPostMasonry> = ({
   }, [isXs, isSm, isMd, isLg, isXl]);
 
   return (
-    <Masonry
-      columns={breakpointCols}
-      spacing={1}
-      aria-label="posts"
-    >
-       {posts.map((post, index) => (
-          <MasonryItem
-            key={post._id ? (post._id as unknown) as string : `post_${index}`}
-          >
-            <Post post={post} />
-          </MasonryItem>
-        ))}
+    <Masonry columns={breakpointCols} spacing={1} aria-label='posts'>
+      {posts.map((post, index) => (
+        <MasonryItem key={post._id ? (post._id as unknown as string) : `post_${index}`}>
+          <Post post={post} />
+        </MasonryItem>
+      ))}
     </Masonry>
   );
-}
+};
 
 export default PostMasonry;
