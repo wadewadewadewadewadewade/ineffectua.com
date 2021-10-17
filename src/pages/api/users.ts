@@ -1,27 +1,44 @@
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
-import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
-import auth0, {
+import {
   createUser,
-  getUser,
-  INextApiRequestWithUser,
-} from '../../common/utils/auth0';
-import { UserProfile } from '@auth0/nextjs-auth0';
+  ICreateUserUser,
+  IUser,
+} from '../../common/models/users/user';
+import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
+import { SHA256 } from 'crypto-js';
+import passport from 'passport';
 
-const handler = nextConnect<
-  INextApiRequestWithDB & INextApiRequestWithUser,
-  NextApiResponse
->();
-handler.use(auth0);
+const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
 handler.use(mongodb);
 
 handler.get(async (req, res) => {
-  const { _id } = req.user;
-  res.json(await getUser(req.db, _id));
+  passport.use(
+    new LocalStrategy(function (
+      email: string,
+      password: string,
+      done: (err, user) => void,
+    ) {
+      req.db
+        .collection<IUser>('users')
+        .findOne({ email }, function (err, user) {
+          if (err) {
+            return done(err, null);
+          }
+          if (!user) {
+            return done(null, false);
+          }
+          if (SHA256(password).toString() !== user.password) {
+            return done(null, false);
+          }
+          return done(null, user);
+        });
+    }),
+  );
 });
 
 handler.post(async (req, res) => {
-  const userData: UserProfile = req.body;
+  const userData: ICreateUserUser = req.body;
   const user = await createUser(req.db, userData);
   res.status(200).json(user);
 });

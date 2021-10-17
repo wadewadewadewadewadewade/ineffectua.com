@@ -1,10 +1,12 @@
-import { Link } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
+import { SignIn } from './SignIn';
+import { SignUp } from './SignUp';
 
-export const Authentication: React.FC = () => (
-  <>
-    <Link href='/api/auth/login'>Login</Link>
-    {' or '}
-    <Link href='/api/signup'>Sign Up</Link>
-  </>
-);
+export const Authentication: React.FC = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  return isSignUp ? (
+    <SignUp onToggleAuthenticationMode={() => setIsSignUp(false)} />
+  ) : (
+    <SignIn onToggleAuthenticationMode={() => setIsSignUp(true)} />
+  );
+};
