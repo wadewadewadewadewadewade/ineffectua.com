@@ -4,10 +4,6 @@ import { ObjectId } from 'mongodb';
 import { IPost, PostProjection } from '../../../common/models/posts/post';
 import { IPostWithReplies } from '../../../common/types/IPost';
 import nextConnect from 'next-connect';
-import userfront, {
-  getUsersForPosts,
-  INextApiRequestWithUser,
-} from '../../../common/utils/auth0';
 
 const handler = nextConnect<
   INextApiRequestWithDB & INextApiRequestWithUser,
