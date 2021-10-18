@@ -1,45 +1,24 @@
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import {
-  createUser,
+  createOrGetExistingUser,
   ICreateUserUser,
-  IUser,
 } from '../../common/models/users/user';
 import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
-import { SHA256 } from 'crypto-js';
-import passport from 'passport';
+import { INextApiRequestWithUserOptional, passportLocalUserOptional } from '../../common/utils/passport-local';
 
-const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
-handler.use(mongodb);
+const handler = nextConnect<INextApiRequestWithDB & INextApiRequestWithUserOptional, NextApiResponse>();
+handler.use(mongodb).use(passportLocalUserOptional);
 
 handler.get(async (req, res) => {
-  passport.use(
-    new LocalStrategy(function (
-      email: string,
-      password: string,
-      done: (err, user) => void,
-    ) {
-      req.db
-        .collection<IUser>('users')
-        .findOne({ email }, function (err, user) {
-          if (err) {
-            return done(err, null);
-          }
-          if (!user) {
-            return done(null, false);
-          }
-          if (SHA256(password).toString() !== user.password) {
-            return done(null, false);
-          }
-          return done(null, user);
-        });
-    }),
-  );
+  // test for user is authenticated
+  res.json(!!req.user);
 });
 
 handler.post(async (req, res) => {
+  // TODO: verify req.user has permissions to perform actions
   const userData: ICreateUserUser = req.body;
-  const user = await createUser(req.db, userData);
+  const user = await createOrGetExistingUser(req.db, userData);
   res.status(200).json(user);
 });
 

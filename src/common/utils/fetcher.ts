@@ -3,6 +3,7 @@ export enum EApiEndpoints {
   USER = 'users/',
   POSTS = 'posts',
   POST = 'posts/',
+  SIGNIN = 'auth/signin',
 }
 
 const fetcher = async (

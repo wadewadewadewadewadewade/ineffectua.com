@@ -38,7 +38,7 @@ export const UserProjectionRecord: Record<keyof IUser, 0 | 1> = {
   createdAt: 0,
 };
 
-const UserProjection = UserProjectionRecord as FindOptions<IUser>;
+export const UserProjection = UserProjectionRecord as FindOptions<IUser>;
 
 export const getUser = async (
   db: Db,
@@ -60,16 +60,25 @@ export interface ICreateUserUser {
   name?: IUser['name'];
 }
 
-export const createUser = async (
+export const createOrGetExistingUser = async (
   db: Db,
   user: ICreateUserUser,
 ): Promise<IUserProjection> => {
+  const passwordEncoded = SHA256(user.password).toString();
+  const existingUser: IUserProjection | false = await db
+    .collection<IUserProjection>('users').findOne({
+      email: user.email,
+      password: passwordEncoded
+    }, UserProjection);
+  if (existingUser) {
+    return existingUser;
+  }
   const createdAt = new Date(Date.now()).toUTCString();
   const result = await db
     .collection<Partial<Omit<IUser, '_id'>>>('users')
     .insertOne({
       email: user.email,
-      password: SHA256(user.password).toString(),
+      password: passwordEncoded,
       username: user.username,
       name: user.name,
       createdAt,

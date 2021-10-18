@@ -4,13 +4,14 @@ import { ObjectId } from 'mongodb';
 import { IPost, PostProjection } from '../../../common/models/posts/post';
 import { IPostWithReplies } from '../../../common/types/IPost';
 import nextConnect from 'next-connect';
+import passportLocalUser, { INextApiRequestWithUser } from '../../../common/utils/passport-local';
+import { getUsersForPosts } from '../../../common/models/users/user';
 
 const handler = nextConnect<
   INextApiRequestWithDB & INextApiRequestWithUser,
   NextApiResponse
 >();
-handler.use(userfront);
-handler.use(mongodb);
+handler.use(mongodb).use(passportLocalUser);
 
 handler.get(async (req, res) => {
   const postId = Array.isArray(req.query.postId)
@@ -64,6 +65,7 @@ handler.get(async (req, res) => {
 });
 
 handler.delete(async (req, res) => {
+  // TODO: verify req.user has permissions to perform actions
   const { user } = req;
   if (user) {
     const postId = Array.isArray(req.query.postId)
@@ -72,7 +74,7 @@ handler.delete(async (req, res) => {
     const result = await req.db.collection<IPost>('posts').updateOne(
       {
         _id: new ObjectId(postId),
-        authorId: user.userId,
+        authorId: user._id,
       },
       {
         $set: { deleted: new Date(Date.now()).toUTCString() },

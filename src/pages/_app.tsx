@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
-import { UserProvider } from '@auth0/nextjs-auth0';
+import { AuthenticationContextProvider } from '../common/context/AuthenticationContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -10,9 +10,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         <title>Create Next App</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <UserProvider>
+      <AuthenticationContextProvider>
         <Component {...pageProps} />
-      </UserProvider>
+      </AuthenticationContextProvider>
     </>
   );
 }

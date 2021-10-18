@@ -9,7 +9,7 @@ import { IUser } from '../common/models/users/user';
 
 export async function getServerSideProps() {
   const user: IUser | false = await (
-    await fetch('http://localhost:3000/api/auth/me')
+    await fetch('http://localhost:3000/api/users')
   ).json();
   const posts =
     user === false ? [] : await fetchJson('GET', EApiEndpoints.POSTS);
@@ -52,11 +52,7 @@ export default function Home({
       </main>
 
       <footer className={styles.footer}>
-        <a
-          href='https://vercel.com?utm_source=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
+        <a href='https://vercel.com' target='_blank' rel='noopener noreferrer'>
           Powered by{' '}
           <img src='/vercel.svg' alt='Vercel Logo' className={styles.logo} />
         </a>

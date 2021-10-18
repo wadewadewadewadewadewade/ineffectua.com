@@ -49,7 +49,7 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
               signIn: async (email: IUser['email'], password: string) => {
                 const newUser: IUser | string = await fetchJson(
                   'POST',
-                  EApiEndpoints.USERS,
+                  EApiEndpoints.SIGNIN,
                   undefined,
                   JSON.stringify({
                     email,
