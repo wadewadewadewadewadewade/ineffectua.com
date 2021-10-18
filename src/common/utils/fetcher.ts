@@ -3,7 +3,9 @@ export enum EApiEndpoints {
   USER = 'users/',
   POSTS = 'posts',
   POST = 'posts/',
-  SIGNIN = 'auth/signin',
+  VERIFY = 'auth',
+  SIGNIN = 'users',
+  SIGNUP = 'users',
 }
 
 const fetcher = async (
@@ -16,7 +18,7 @@ const fetcher = async (
     'Content-Type': 'application/json',
   },
 ) => {
-  let url = `http://localhost:3000/api/${endpoint}`;
+  let url = `http://localhost:3333/api/${endpoint}`;
   if (endpoint === EApiEndpoints.POST && !!params) {
     url = `${url}${params}`;
   }

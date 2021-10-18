@@ -7,10 +7,9 @@ import styles from '../styles/pages/index.module.scss';
 import { Authentication } from '../common/components/users/Authentication';
 import { IUser } from '../common/models/users/user';
 
-export async function getServerSideProps() {
-  const user: IUser | false = await (
-    await fetch('http://localhost:3000/api/users')
-  ).json();
+export async function getServerSideProps(context) {
+  console.log('getServerSideProps', context.req.session);
+  const user: IUser | false = context?.req?.session?.passport?.user || false;
   const posts =
     user === false ? [] : await fetchJson('GET', EApiEndpoints.POSTS);
   return {

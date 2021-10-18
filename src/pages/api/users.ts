@@ -4,22 +4,26 @@ import {
   createOrGetExistingUser,
   ICreateUserUser,
 } from '../../common/models/users/user';
-import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
-import { INextApiRequestWithUserOptional, passportLocalUserOptional } from '../../common/utils/passport-local';
+import { INextApiRequestWithDB } from '../../common/utils/mongodb';
+import handerWithUserAndDB from '../../common/utils/passport-local';
+import passport from 'passport';
 
-const handler = nextConnect<INextApiRequestWithDB & INextApiRequestWithUserOptional, NextApiResponse>();
-handler.use(mongodb).use(passportLocalUserOptional);
+const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
+handler.use(handerWithUserAndDB);
 
-handler.get(async (req, res) => {
-  // test for user is authenticated
-  res.json(!!req.user);
-});
+handler.post((req, res) => {
+  passport.authenticate('local', (err, user) => {
+    if (err) {
+      return res.status(400).send({ error: err });
+    }
+    console.log(req.body);
 
-handler.post(async (req, res) => {
-  // TODO: verify req.user has permissions to perform actions
-  const userData: ICreateUserUser = req.body;
-  const user = await createOrGetExistingUser(req.db, userData);
-  res.status(200).json(user);
+    // TODO: verify req.user has permissions to perform actions
+    const userData: ICreateUserUser = req.body;
+    createOrGetExistingUser(req.db, { ...userData, ...user }).then(newUser =>
+      res.status(200).json(newUser),
+    );
+  });
 });
 
 export default handler;

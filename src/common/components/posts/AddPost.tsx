@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import RichText from '../RichText/RichText';
 import fetchJson, { EApiEndpoints } from '../../utils/fetcher';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { IPostWithReplies } from '../../types/IPost';
 import ExpandMore from '../ExpandMore';
-import { useUser } from '@auth0/nextjs-auth0';
+import AuthenticationContext from '../../context/AuthenticationContext';
 
 interface IFormData {
   body: string;
@@ -34,7 +34,8 @@ export const AddPost: React.FC<IAddPost> = ({
   onWillPost,
   onPost,
 }) => {
-  const { user, error, isLoading: isUserLoading } = useUser();
+  const userContext = useContext(AuthenticationContext);
+  const isUserLoading = userContext === true;
   const [body, setBody] = useState<string>();
   const [showReplies, setShowReplies] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -91,10 +92,6 @@ export const AddPost: React.FC<IAddPost> = ({
   };
   if (isUserLoading) {
     return null;
-  }
-  if (error) {
-    console.error(error);
-    throw error;
   }
   return (
     <Card sx={{ overflow: 'visible' }}>

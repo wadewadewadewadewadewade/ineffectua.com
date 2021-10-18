@@ -23,11 +23,11 @@ interface ISignUp {
 }
 
 export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
-  const userfrontAuthentication = useContext(AuthenticationContext);
-  const { signUp } =
-    'signUp' in userfrontAuthentication
-      ? userfrontAuthentication
-      : { signUp: undefined };
+  const authentication = useContext(AuthenticationContext);
+  const signUp =
+    authentication !== true && 'signUp' in authentication
+      ? authentication.signUp
+      : undefined;
   const {
     handleSubmit,
     control,
@@ -231,7 +231,11 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
           sx={{ flexGrow: 1, paddingLeft: 2, paddingRight: 2, marginTop: 2 }}
           disableGutters
         >
-          <Button type='submit' variant='contained'>
+          <Button
+            type='submit'
+            variant='contained'
+            onClick={handleSubmit(onSubmit)}
+          >
             Sign Up
           </Button>
           <Box sx={{ display: 'flex', flexGrow: 1 }}></Box>

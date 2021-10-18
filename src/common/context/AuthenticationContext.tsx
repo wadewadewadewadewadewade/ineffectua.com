@@ -12,7 +12,7 @@ interface IAuthenticationContext {
 }
 
 export const AuthenticationContext = createContext<
-  IAuthenticationContext | IUserProjection | undefined
+  IAuthenticationContext | IUserProjection | true
 >(undefined);
 AuthenticationContext.displayName = 'Authentication';
 
@@ -21,7 +21,7 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
     const getUser = async () => {
-      const u: IUser | false = await fetchJson('GET', EApiEndpoints.USERS);
+      const u: IUser | false = await fetchJson('GET', EApiEndpoints.VERIFY);
       setUser(u);
       setIsLoading(false);
     };
@@ -30,13 +30,15 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
   return (
     <AuthenticationContext.Provider
       value={
-        user && user.isConfirmed
+        isLoading === true
+          ? isLoading
+          : user && user.isConfirmed
           ? user
           : {
               signUp: async (props: ICreateUserUser) => {
                 const newUser: IUser | string = await fetchJson(
                   'POST',
-                  EApiEndpoints.USERS,
+                  EApiEndpoints.SIGNUP,
                   undefined,
                   JSON.stringify(props),
                 );

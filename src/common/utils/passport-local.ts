@@ -1,78 +1,31 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import nextConnect, { NextHandler } from 'next-connect';
-import { IUser } from '../models/users/user';
+import { NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
 import passport from 'passport';
-import mongodb, { INextApiRequestWithDB } from './mongodb';
+import mongodb, { INextApiRequestWithDB, validateUser } from './mongodb';
+import { Strategy as LocalStrategy } from 'passport-local';
+import redis from 'redis';
+import ConnectRedis from 'connect-redis';
+import session from 'express-session';
 
-export interface INextApiRequestWithUser extends NextApiRequest {
-  user: IUser;
-}
+const RedisStore = ConnectRedis(session);
+const redisClient = redis.createClient();
 
-export interface INextApiRequestWithUserOptional extends NextApiRequest {
-  user?: IUser;
-}
+const sessionConfig = {
+  store: new RedisStore({ client: redisClient }),
+  secret: 'static session key that is persisting',
+  cookie: {
+    maxAge: 86400 * 1000,
+  },
+  resave: false,
+  saveUninitialized: true,
+};
+const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
+handler.use(mongodb).use(session(sessionConfig));
 
-async function passportLocalHandler(
-  req: INextApiRequestWithDB & INextApiRequestWithUser,
-  res: NextApiResponse,
-  next: NextHandler,
-) {
-  await new Promise<void>((resolve, reject) =>
-    passport.authenticate('local', (err, user, info, status) => {
-      console.log(err, user, info, status);
-      if (err) {
-        next(err);
-      }
-      if (!user) {
-        res.status(401);
-      }
-      if (err || !user) {
-        reject();
-      }
-      req.user = user;
-      resolve();
-    }),
-  );
-  return next();
-}
+passport.use(new LocalStrategy(validateUser));
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
 
-const middleware = nextConnect<
-  INextApiRequestWithDB & INextApiRequestWithUser,
-  NextApiResponse
->();
+handler.use(passport.initialize()).use(passport.session());
 
-middleware.use(mongodb).use(passport.initialize()).use(passportLocalHandler);
-
-export default middleware;
-
-async function passportLocalUserOptionalHandler(
-  req: INextApiRequestWithDB & INextApiRequestWithUserOptional,
-  res: NextApiResponse,
-  next: NextHandler,
-) {
-  await new Promise<void>((resolve, reject) =>
-    passport.authenticate('local', (err, user, info, status) => {
-      console.log(err, user, info, status);
-      if (err) {
-        next(err);
-      }
-      if (err || !user) {
-        req.user = undefined;
-        reject();
-      }
-      req.user = user;
-      resolve();
-    }),
-  );
-  return next();
-}
-
-export const passportLocalUserOptional = nextConnect<
-  INextApiRequestWithDB & INextApiRequestWithUserOptional,
-  NextApiResponse
->();
-
-passportLocalUserOptional
-  .use(mongodb)
-  .use(passport.initialize())
-  .use(passportLocalUserOptionalHandler);
+export default handler;
