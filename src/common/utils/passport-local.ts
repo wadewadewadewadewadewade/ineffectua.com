@@ -4,6 +4,14 @@ import passport from 'passport';
 import mongodb, { INextApiRequestWithDB, validateUser } from './mongodb';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Session } from '../models/session/session';
+import { Request } from 'express';
+import { IUser } from '../models/users/user';
+
+export interface INextApiResponseWithDBAndUser
+  extends INextApiRequestWithDB,
+    Pick<Request, 'logIn' | 'logOut' | 'isAuthenticated'> {
+  user?: Partial<IUser>;
+}
 
 const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
 handler

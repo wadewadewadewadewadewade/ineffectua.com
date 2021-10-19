@@ -1,4 +1,3 @@
-import { createOrGetExistingUser } from './../../../common/models/users/user';
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import handerWithUserAndDB, {
@@ -8,17 +7,12 @@ import handerWithUserAndDB, {
 const handler = nextConnect<INextApiResponseWithDBAndUser, NextApiResponse>();
 handler.use(handerWithUserAndDB);
 
-handler.post(async (req, res) => {
-  const user = await createOrGetExistingUser(req.db, req.body);
+handler.get(async (req, res) => {
+  const user = req.user;
   if (user) {
-    req.logIn(user, err => {
-      if (err) {
-        throw err;
-      }
-      res.json(user);
-    });
+    req.logOut();
   }
-  res.json('Missing user data');
+  res.json({ message: 'Signed out' });
 });
 
 export default handler;

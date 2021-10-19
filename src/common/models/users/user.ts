@@ -2,6 +2,7 @@ import { Db, FindOptions } from 'mongodb';
 import { IPostWithReplies } from '../../types/IPost';
 import { IPost } from '../posts/post';
 import { SHA256 } from 'crypto-js';
+import { TVerifyUserResponse } from '../../../pages/api/auth';
 
 export interface IUser {
   _id: string;
@@ -66,10 +67,14 @@ export const createOrGetExistingUser = async (
 ): Promise<IUserProjection> => {
   const passwordEncoded = SHA256(user.password).toString();
   const existingUser: IUserProjection | false = await db
-    .collection<IUserProjection>('users').findOne({
-      email: user.email,
-      password: passwordEncoded
-    }, UserProjection);
+    .collection<IUserProjection>('users')
+    .findOne(
+      {
+        email: user.email,
+        password: passwordEncoded,
+      },
+      UserProjection,
+    );
   if (existingUser) {
     return existingUser;
   }
@@ -94,6 +99,26 @@ export const createOrGetExistingUser = async (
     _id: result.insertedId.toString(),
     lastActiveAt: createdAt,
   };
+};
+
+export const getExistingUser = async (
+  db: Db,
+  user: ICreateUserUser,
+): Promise<TVerifyUserResponse> => {
+  const passwordEncoded = SHA256(user.password).toString();
+  const existingUser: IUserProjection | false = await db
+    .collection<IUserProjection>('users')
+    .findOne(
+      {
+        email: user.email,
+        password: passwordEncoded,
+      },
+      UserProjection,
+    );
+  if (existingUser) {
+    return existingUser;
+  }
+  return { isAuthenticated: false };
 };
 
 export const getUsersForPosts = (

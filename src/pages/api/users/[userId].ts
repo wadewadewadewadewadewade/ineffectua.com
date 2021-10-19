@@ -1,19 +1,15 @@
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import { getUser } from '../../../common/models/users/user';
-import { INextApiRequestWithDB } from '../../../common/utils/mongodb';
-import handerWithUserAndDB from '../../../common/utils/passport-local';
-import passport from 'passport';
+import handerWithUserAndDB, {
+  INextApiResponseWithDBAndUser,
+} from '../../../common/utils/passport-local';
 
-const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
+const handler = nextConnect<INextApiResponseWithDBAndUser, NextApiResponse>();
 handler.use(handerWithUserAndDB);
 
 handler.get((req, res) => {
-  passport.authenticate('local', (err, user) => {
-    if (err) {
-      return res.status(400).send({ error: err });
-    }
-
+  if (req.isAuthenticated()) {
     // TODO: verify req.user has permissions to perform actions
     if ('_id' in req.query) {
       if (typeof req.query._id === 'string') {
@@ -25,15 +21,11 @@ handler.get((req, res) => {
     } else {
       // it's a logout
     }
-  });
+  }
 });
 
 handler.put((req, res) => {
-  passport.authenticate('local', (err, user) => {
-    if (err) {
-      return res.status(400).send({ error: err });
-    }
-
+  if (req.isAuthenticated()) {
     // TODO: verify req.user has permissions to perform actions
     if ('_id' in req.query) {
       if (typeof req.query._id === 'string') {
@@ -47,7 +39,7 @@ handler.put((req, res) => {
     } else {
       res.status(501).json('No user specified');
     }
-  });
+  }
 });
 
 export default handler;

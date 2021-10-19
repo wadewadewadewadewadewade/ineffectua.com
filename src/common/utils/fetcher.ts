@@ -1,11 +1,11 @@
 export enum EApiEndpoints {
-  USERS = 'users',
   USER = 'users/',
   POSTS = 'posts',
   POST = 'posts/',
   VERIFY = 'auth',
-  SIGNIN = 'users',
+  SIGNIN = 'auth/signin',
   SIGNUP = 'auth/signup',
+  SIGNOUT = 'auth/signout',
   CONFIRMEMAIL = 'auth/confirmemail',
 }
 

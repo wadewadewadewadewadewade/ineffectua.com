@@ -154,7 +154,11 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
           sx={{ flexGrow: 1, paddingLeft: 2, paddingRight: 2, marginTop: 2 }}
           disableGutters
         >
-          <Button type='submit' variant='contained'>
+          <Button
+            type='submit'
+            variant='contained'
+            onClick={handleSubmit(onSubmit)}
+          >
             Sign In
           </Button>
           <Box sx={{ display: 'flex', flexGrow: 1 }}></Box>

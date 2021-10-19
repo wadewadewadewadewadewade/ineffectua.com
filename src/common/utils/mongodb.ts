@@ -62,17 +62,14 @@ export const validateUser: VerifyFunctionWithRequest = async (
   password,
   done,
 ) => {
-  console.log('validateUser');
   if (!client.isConnected) await client.connect();
   const user = await client
     .db(process.env.MONGODB_DB)
     .collection<IUserProjection & { password: string }>('users')
     .findOne({ email }, UserProjection);
-  console.log('user', user);
   if (!user) {
     return done(null, undefined);
   }
-  console.log('password');
   if (user.password !== SHA256(password).toString()) {
     return done(null, undefined);
   }
