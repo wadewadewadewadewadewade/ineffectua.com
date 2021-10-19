@@ -5,8 +5,11 @@ export enum EApiEndpoints {
   POST = 'posts/',
   VERIFY = 'auth',
   SIGNIN = 'users',
-  SIGNUP = 'users',
+  SIGNUP = 'auth/signup',
+  CONFIRMEMAIL = 'auth/confirmemail',
 }
+
+const hostnameAndPort = process.env.HOSTNAME_AND_PORT;
 
 const fetcher = async (
   method: RequestInit['method'],
@@ -18,12 +21,18 @@ const fetcher = async (
     'Content-Type': 'application/json',
   },
 ) => {
-  let url = `http://localhost:3333/api/${endpoint}`;
+  let url = `${
+    hostnameAndPort ||
+    `${window.location.protocol}//${window.location.hostname}${
+      window.location.port ? `:${window.location.port}` : ''
+    }`
+  }/api/${endpoint}`;
   if (endpoint === EApiEndpoints.POST && !!params) {
     url = `${url}${params}`;
   }
   const response = await fetch(url, {
     method,
+    credentials: 'include',
     ...(headers ? { headers } : {}),
     body,
   });

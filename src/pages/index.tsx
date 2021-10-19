@@ -6,16 +6,25 @@ import fetchJson, { EApiEndpoints } from '../common/utils/fetcher';
 import styles from '../styles/pages/index.module.scss';
 import { Authentication } from '../common/components/users/Authentication';
 import { IUser } from '../common/models/users/user';
+import { ConfirmEmail } from '../common/components/users/ConfirmEmail';
+import { GetServerSidePropsContext } from 'next';
 
-export async function getServerSideProps(context) {
-  console.log('getServerSideProps', context.req.session);
-  const user: IUser | false = context?.req?.session?.passport?.user || false;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const user: IUser | false = await fetchJson(
+    'GET',
+    EApiEndpoints.VERIFY,
+    undefined,
+    undefined,
+    context.req.headers,
+  );
   const posts =
-    user === false ? [] : await fetchJson('GET', EApiEndpoints.POSTS);
+    user === false || !user.isConfirmed
+      ? []
+      : await fetchJson('GET', EApiEndpoints.POSTS);
   return {
     props: {
       posts,
-      user: false,
+      user,
       fallback: 'blocking',
     },
   };
@@ -36,15 +45,19 @@ export default function Home({
           Welcome to <a href='https://nextjs.org'>Next.js with MongoDB!</a>
         </h1>
         {user ? (
-          <>
-            <h2 className='subtitle'>Posts</h2>
-            <AddPost
-              onPost={() => {
-                router.replace(router.asPath);
-              }}
-              replies={posts}
-            />
-          </>
+          user.isConfirmed ? (
+            <>
+              <h2 className='subtitle'>Posts</h2>
+              <AddPost
+                onPost={() => {
+                  router.replace(router.asPath);
+                }}
+                replies={posts}
+              />
+            </>
+          ) : (
+            <ConfirmEmail />
+          )
         ) : (
           <Authentication />
         )}

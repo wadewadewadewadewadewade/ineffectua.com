@@ -24,16 +24,22 @@ interface ISignIn {
 }
 
 export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
-  const userfrontAuthentication = useContext(AuthenticationContext);
-  const { signIn } =
-    'signIn' in userfrontAuthentication
-      ? userfrontAuthentication
-      : { signIn: undefined };
+  const authentication = useContext(AuthenticationContext);
+  const signIn =
+    authentication !== true && 'signIn' in authentication
+      ? authentication.signIn
+      : undefined;
   const {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<IFormData>();
+  } = useForm<IFormData>({
+    defaultValues: {
+      email: '',
+      password: '',
+      password_confirm: '',
+    },
+  });
   const onSubmit = async (data: IFormData) => {
     if (signIn) {
       await signIn(data.email, data.password);
@@ -93,6 +99,7 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='email'
                           type='email'
+                          autoComplete='email'
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -126,6 +133,7 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='password'
                           type='password'
+                          autoComplete='password'
                           {...field}
                           sx={{ width: '100%' }}
                         />

@@ -8,11 +8,17 @@ interface IAuthenticationContext {
   signIn: (email: IUser['email'], password: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (password: string) => Promise<boolean>;
-  // sendConfirmationEmail?: () => Promise<void>;
+}
+
+interface IConfirmAuthenticationContext {
+  sendConfirmationEmail?: () => Promise<void>;
 }
 
 export const AuthenticationContext = createContext<
-  IAuthenticationContext | IUserProjection | true
+  | IAuthenticationContext
+  | IConfirmAuthenticationContext
+  | IUserProjection
+  | true
 >(undefined);
 AuthenticationContext.displayName = 'Authentication';
 
@@ -34,6 +40,11 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
           ? isLoading
           : user && user.isConfirmed
           ? user
+          : user && !user.isConfirmed
+          ? {
+              sendConfirmationEmail: async () =>
+                await fetchJson('GET', EApiEndpoints.CONFIRMEMAIL),
+            }
           : {
               signUp: async (props: ICreateUserUser) => {
                 const newUser: IUser | string = await fetchJson(

@@ -33,7 +33,15 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
     control,
     formState: { errors },
     watch,
-  } = useForm<IFormData>();
+  } = useForm<IFormData>({
+    defaultValues: {
+      name: '',
+      username: '',
+      email: '',
+      password: '',
+      password_confirm: '',
+    },
+  });
   const passwordConfirm = watch('password_confirm');
   const onSubmit = async (data: IFormData) => {
     if (!!signUp && data.password === data.password_confirm) {
@@ -114,6 +122,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='username'
                           type='text'
+                          autoComplete='username'
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -146,6 +155,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='email'
                           type='email'
+                          autoComplete='email'
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -179,6 +189,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='password'
                           type='password'
+                          autoComplete='new-password'
                           {...field}
                           sx={{ width: '100%' }}
                         />
