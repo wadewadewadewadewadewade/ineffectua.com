@@ -68,7 +68,6 @@ export default function Home({
               onPost={() => {
                 router.replace(router.asPath);
               }}
-              replies={posts}
             />
           </>
         ) : (

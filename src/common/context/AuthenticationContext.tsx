@@ -1,4 +1,5 @@
 import { CircularProgress, Box } from '@mui/material';
+import { useRouter } from 'next/dist/client/router';
 import React, { createContext, useEffect, useState } from 'react';
 import { TVerifyUserResponse } from '../../pages/api/auth';
 import { ICreateUserUser, IUser, IUserProjection } from '../models/users/user';
@@ -27,6 +28,7 @@ export const AuthenticationContext = createContext<
 AuthenticationContext.displayName = 'Authentication';
 
 export const AuthenticationContextProvider: React.FC = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState<TVerifyUserResponse>({
     isAuthenticated: false,
   });
@@ -43,7 +45,7 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
         console.error(newUser);
       } else {
         setUser(newUser);
-        window.location.reload();
+        router.replace(router.asPath);
       }
     },
     signIn: async (email: IUser['email'], password: string) => {
@@ -60,7 +62,7 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
         console.error(newUser);
       } else {
         setUser(newUser);
-        window.location.reload();
+        router.replace(router.asPath);
       }
     },
     resetPassword: async (password: string) => {
@@ -88,7 +90,7 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
     if ('_id' in user) {
       await fetchJson('GET', EApiEndpoints.SIGNOUT);
       setUser(undefined);
-      window.location.reload();
+      router.replace(router.asPath);
     }
   };
   const sendConfirmationEmail: IConfirmAuthenticationContext['sendConfirmationEmail'] =
