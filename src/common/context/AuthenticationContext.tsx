@@ -1,5 +1,5 @@
 import { CircularProgress, Box } from '@mui/material';
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { TVerifyUserResponse } from '../../pages/api/auth';
 import { ICreateUserUser, IUser, IUserProjection } from '../models/users/user';
 import fetchJson, { EApiEndpoints } from '../utils/fetcher';
@@ -86,8 +86,9 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
   };
   const logout: IAuthenticationContextUser['logout'] = async () => {
     if ('_id' in user) {
-      await fetchJson('GET', EApiEndpoints.USER, user._id);
+      await fetchJson('GET', EApiEndpoints.SIGNOUT);
       setUser(undefined);
+      window.location.reload();
     }
   };
   const sendConfirmationEmail: IConfirmAuthenticationContext['sendConfirmationEmail'] =

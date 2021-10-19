@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import RichText from '../RichText/RichText';
 import fetchJson, { EApiEndpoints } from '../../utils/fetcher';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -24,19 +24,20 @@ interface IFormData {
 }
 
 interface IAddPost {
-  replies?: IPostWithReplies[];
+  inReplyTo?: IPostWithReplies['_id'];
   onWillPost?: () => void;
   onPost?: (newPost: IPostWithReplies) => void;
 }
 
 export const AddPost: React.FC<IAddPost> = ({
-  replies,
+  inReplyTo,
   onWillPost,
   onPost,
 }) => {
   const userContext = useContext(AuthenticationContext);
   const isUserLoading = userContext === true;
   const [body, setBody] = useState<string>();
+  const [replies, setReplies] = useState<IPostWithReplies[]>([]);
   const [showReplies, setShowReplies] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const imagesRef = useRef<string[]>([]);
@@ -49,6 +50,17 @@ export const AddPost: React.FC<IAddPost> = ({
       method({ body });
     };
   };
+  useEffect(() => {
+    const getReplies = async () => {
+      const rep = await fetchJson(
+        'GET',
+        EApiEndpoints.POSTS,
+        inReplyTo ? `?inReplyTo=${inReplyTo}` : undefined,
+      );
+      setReplies(rep);
+    };
+    getReplies();
+  }, [inReplyTo]);
   const onSubmit = async (data: IFormData) => {
     // ignore submissions with no body
     if (!data.body || data.body.length < 1) {
@@ -80,7 +92,7 @@ export const AddPost: React.FC<IAddPost> = ({
       'POST',
       EApiEndpoints.POSTS,
       undefined,
-      JSON.stringify(data),
+      JSON.stringify({ ...data, ...(inReplyTo ? { inReplyTo } : {}) }),
       {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -109,7 +121,7 @@ export const AddPost: React.FC<IAddPost> = ({
               justifyContent: 'center',
               alignItems: 'center',
               position: 'absolute',
-              zIndex: 3,
+              zIndex: 93,
               top: 0,
               left: 0,
               width: '100%',
@@ -167,7 +179,7 @@ export const AddPost: React.FC<IAddPost> = ({
         timeout='auto'
         sx={{ paddingLeft: 1, paddingRight: 1 }}
       >
-        <PostMasonry posts={replies || []} />
+        {showReplies && <PostMasonry posts={replies || []} />}
       </Collapse>
     </Card>
   );

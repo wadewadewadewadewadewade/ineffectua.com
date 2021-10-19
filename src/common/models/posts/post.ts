@@ -13,7 +13,7 @@ const PostProjectionRecord: Record<keyof IPost, 0 | 1> = {
 export interface IPost {
   _id: string;
   author: Pick<IUser, '_id' | 'name' | 'image'>;
-  inReplyTo?: ObjectId;
+  inReplyTo?: string;
   created: string;
   deleted?: string;
   body: string;

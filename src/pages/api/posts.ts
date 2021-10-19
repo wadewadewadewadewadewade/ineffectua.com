@@ -14,11 +14,13 @@ handler.get(async (req, res) => {
   if (req.isAuthenticated()) {
     // select posts based on if authenticated user exists
   }
+  const inReplyTo =
+    typeof req.query.inReplyTo === 'string' ? req.query.inReplyTo : undefined;
   req.db
     .collection<IPost>('posts')
     .find(
       {
-        replyTo: undefined,
+        inReplyTo,
         deleted: undefined,
       },
       PostProjection,
@@ -35,20 +37,29 @@ handler.get(async (req, res) => {
 });
 
 handler.post(async (req, res) => {
-  if (!req.user) {
+  if (!req.user || !('_id' in req.user)) {
     res.status(401).json('Unauthorized');
   } else {
-    const { inReplyTo, body } = req.body;
-    const { _id, name, image } = req.user as Partial<IUser>;
-    const author = { _id, name, image };
-    const created = new Date(Date.now()).toUTCString();
-    const newPost: Omit<IPost, '_id'> = { inReplyTo, created, body, author };
-    const result = req.db
-      .collection<Omit<IPost, '_id'>>('posts')
-      .insertOne(newPost)
-      .then(newPost =>
-        res.json({ ...newPost, _id: result.insertedId.toString() }),
-      );
+    try {
+      const { inReplyTo, body } = req.body;
+      const { _id } = req.user as Partial<IUser>;
+      const author = { _id };
+      const created = new Date(Date.now()).toUTCString();
+      const newPost: Omit<IPost, '_id' | 'author'> & {
+        author: { _id: string };
+      } = { inReplyTo, created, body, author };
+      req.db
+        .collection<
+          Omit<IPost, '_id' | 'author'> & { author: { _id: string } }
+        >('posts')
+        .insertOne(newPost)
+        .then(result =>
+          res.json({ ...newPost, _id: result.insertedId.toString() }),
+        );
+    } catch (ex) {
+      res.json(ex);
+      throw ex;
+    }
   }
 });
 

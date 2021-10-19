@@ -1,4 +1,4 @@
-import { Db, FindOptions } from 'mongodb';
+import { Db, FindOptions, ObjectId } from 'mongodb';
 import { IPostWithReplies } from '../../types/IPost';
 import { IPost } from '../posts/post';
 import { SHA256 } from 'crypto-js';
@@ -48,7 +48,7 @@ export const getUser = async (
   if (_id) {
     const user = await db
       .collection<IUser>('users')
-      .findOne({ _id }, UserProjection);
+      .findOne({ _id: new ObjectId(_id) }, UserProjection);
     return user;
   }
   return false;

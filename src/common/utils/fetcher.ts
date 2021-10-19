@@ -27,7 +27,10 @@ const fetcher = async (
       window.location.port ? `:${window.location.port}` : ''
     }`
   }/api/${endpoint}`;
-  if (endpoint === EApiEndpoints.POST && !!params) {
+  if (
+    (endpoint === EApiEndpoints.POST || endpoint === EApiEndpoints.POSTS) &&
+    !!params
+  ) {
     url = `${url}${params}`;
   }
   const response = await fetch(url, {

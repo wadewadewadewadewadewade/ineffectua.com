@@ -30,7 +30,6 @@ export interface IPostProps {
 }
 
 export const Post: React.FC<IPostProps> = ({ post }) => {
-  const [replies, updateReplies] = useState<IPostWithReplies[]>(post.replies);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showReplies, setShowReplies] = useState(false);
   const onDelete = async () => {
@@ -106,10 +105,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
         timeout='auto'
         sx={{ paddingLeft: 1, paddingRight: 1 }}
       >
-        <AddPost
-          onPost={newPost => updateReplies([newPost, ...replies])}
-          replies={replies}
-        />
+        <AddPost inReplyTo={post._id} />
       </Collapse>
     </Card>
   ) : null;
