@@ -1,26 +1,46 @@
 import React, { useContext } from 'react';
-import {
-  AppBar,
-  IconButton,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { AppBar, Toolbar, Typography, Link as UILink } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import CottageIcon from '@mui/icons-material/Cottage';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import AuthenticationContext from '../../context/AuthenticationContext';
 import { Logout } from '@mui/icons-material';
+import NavigationMenu from './NavigationMenu';
+import Link from 'next/link';
+import { useRouter } from 'next/dist/client/router';
 
-export const SiteAppBar: React.FC<{ title: string }> = ({ title }) => {
+const siteMenu = [
+  {
+    name: 'home',
+    path: '/',
+    children: (
+      <Link href='/'>
+        <UILink sx={{ textDecoration: 'none', display: 'flex' }}>
+          <CottageIcon sx={{ marginRight: 1 }} />
+          Home
+        </UILink>
+      </Link>
+    ),
+  },
+  {
+    name: 'posts',
+    path: '/posts',
+    children: (
+      <Link href='/posts'>
+        <UILink sx={{ textDecoration: 'none', display: 'flex' }}>
+          <PostAddIcon sx={{ marginRight: 1 }} />
+          Posts
+        </UILink>
+      </Link>
+    ),
+  },
+];
+
+export const SiteAppBar: React.FC = () => {
+  const { asPath } = useRouter();
   const authentication = useContext(AuthenticationContext);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // isUserLoading
   if (authentication === true) {
     return null;
   }
@@ -29,56 +49,48 @@ export const SiteAppBar: React.FC<{ title: string }> = ({ title }) => {
   return (
     <AppBar>
       <Toolbar>
-        <IconButton
-          size='large'
-          edge='start'
-          color='inherit'
-          aria-label='menu'
-          sx={{ mr: 2 }}
+        <NavigationMenu
+          name='menu-appbar-navigation'
+          label='site navigation'
+          Icon={MenuIcon}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          menuItems={siteMenu.map(item => ({
+            ...item,
+            selected: item.path === asPath,
+          }))}
+        />
+        <Typography
+          variant='h1'
+          component='div'
+          sx={{ flexGrow: 1, textTransform: 'capitalize', fontSize: '1.5rem' }}
         >
-          <MenuIcon />
-        </IconButton>
-        <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-          {title}
+          {siteMenu.find(item => item.path === asPath)?.name}
         </Typography>
         {isAuthenticated && (
-          <div>
-            <IconButton
-              size='large'
-              aria-label='account of current user'
-              aria-controls='menu-appbar'
-              aria-haspopup='true'
-              onClick={handleMenu}
-              color='inherit'
-            >
-              <AccountCircle />
-            </IconButton>
-            <Menu
-              id='menu-appbar'
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem
-                onClick={async () => {
-                  handleClose();
-                  await logout();
-                }}
-              >
-                <Logout />
-                Sign out
-              </MenuItem>
-            </Menu>
-          </div>
+          <NavigationMenu
+            name='menu-appbar-user'
+            label='account of current user'
+            Icon={AccountCircle}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            menuItems={[
+              {
+                name: 'logout',
+                onClose: logout,
+                children: (
+                  <>
+                    <Logout sx={{ marginRight: 1 }} />
+                    Sign out
+                  </>
+                ),
+              },
+            ]}
+          />
         )}
       </Toolbar>
     </AppBar>

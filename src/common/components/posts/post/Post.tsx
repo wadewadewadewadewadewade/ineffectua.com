@@ -67,7 +67,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
         <Typography color='text.secondary' gutterBottom component='time'>
           {post.created}
         </Typography>
-        <StyledTypography gutterBottom>
+        <StyledTypography as='div'>
           {new Parser().parse(post.body)}
         </StyledTypography>
       </CardContent>

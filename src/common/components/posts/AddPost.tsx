@@ -24,21 +24,23 @@ interface IFormData {
 }
 
 interface IAddPost {
+  replies?: IPostWithReplies[];
   inReplyTo?: IPostWithReplies['_id'];
   onWillPost?: () => void;
   onPost?: (newPost: IPostWithReplies) => void;
 }
 
-export const AddPost: React.FC<IAddPost> = ({
-  inReplyTo,
-  onWillPost,
-  onPost,
-}) => {
+export const AddPost: React.FC<IAddPost> = props => {
+  const { inReplyTo, onWillPost, onPost, replies: passedReplies } = props;
   const userContext = useContext(AuthenticationContext);
   const isUserLoading = userContext === true;
   const [body, setBody] = useState<string>();
-  const [replies, setReplies] = useState<IPostWithReplies[]>([]);
-  const [showReplies, setShowReplies] = useState(false);
+  const [replies, setReplies] = useState<IPostWithReplies[]>(
+    passedReplies || [],
+  );
+  const [showReplies, setShowReplies] = useState(
+    passedReplies && passedReplies.length > 0,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const imagesRef = useRef<string[]>([]);
   const handleSubmit: (
@@ -59,8 +61,8 @@ export const AddPost: React.FC<IAddPost> = ({
       );
       setReplies(rep);
     };
-    getReplies();
-  }, [inReplyTo]);
+    !passedReplies && getReplies();
+  }, [inReplyTo, passedReplies]);
   const onSubmit = async (data: IFormData) => {
     // ignore submissions with no body
     if (!data.body || data.body.length < 1) {
@@ -100,13 +102,15 @@ export const AddPost: React.FC<IAddPost> = ({
     );
     setIsLoading(false);
     setShowReplies(true);
+    // if replies are passed in, update that list here because onPost won't update that
+    props.replies && setReplies(prevState => [...prevState, newPost]);
     onPost && onPost(newPost);
   };
   if (isUserLoading) {
     return null;
   }
   return (
-    <Card sx={{ overflow: 'visible' }}>
+    <Card sx={{ overflow: 'visible', width: '100%' }}>
       <CardContent sx={{ position: 'relative' }}>
         <Fade
           in={isLoading}

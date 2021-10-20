@@ -12,6 +12,7 @@ interface IPostMasonry {
 
 export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
   const theme = useTheme();
+  const postsLength = posts.length;
 
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
   const isSm = useMediaQuery(theme.breakpoints.down('md'));
@@ -20,13 +21,13 @@ export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
   const isXl = !(isXs || isSm || isMd || isLg);
 
   const breakpointCols = useMemo(() => {
-    if (isXs) {
+    if (isXs || postsLength === 1) {
       return 1;
     } else if (isSm) {
       return 1;
-    } else if (isMd) {
+    } else if (isMd || posts.length === 2) {
       return 2;
-    } else if (isLg) {
+    } else if (isLg || posts.length === 3) {
       return 3;
     } else if (isXl) {
       return 4;
@@ -36,7 +37,9 @@ export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
   return (
     <Masonry columns={breakpointCols} spacing={1} aria-label='posts'>
       {posts.map((post, index) => (
-        <MasonryItem key={post._id ? (post._id as unknown as string) : `post_${index}`}>
+        <MasonryItem
+          key={post._id ? (post._id as unknown as string) : `post_${index}`}
+        >
           <Post post={post} />
         </MasonryItem>
       ))}

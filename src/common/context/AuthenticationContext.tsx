@@ -121,7 +121,14 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
       }
     >
       {isLoading ? (
-        <Box sx={{ display: 'flex' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            height: '100vh',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           <CircularProgress />
         </Box>
       ) : (

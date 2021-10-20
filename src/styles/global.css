@@ -1,16 +1,17 @@
-html,
-body {
+body,
+html {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-    sans-serif;
 }
-
 * {
   box-sizing: border-box;
 }
-
 /* for image support in react-draft-wysiwyg */
 .rdw-image-imagewrapper img {
   max-width: 100%;
+}
+
+.public-DraftStyleDefault-block *,
+p {
+  font-family: 'Montserrat', 'Open Sans', sans-serif;
 }
