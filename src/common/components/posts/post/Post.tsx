@@ -27,15 +27,17 @@ const StyledTypography = styled(Typography)(() => ({
 
 export interface IPostProps {
   post: IPostWithReplies;
+  onDelete?: (_id: IPostWithReplies['_id']) => void;
 }
 
-export const Post: React.FC<IPostProps> = ({ post }) => {
+export const Post: React.FC<IPostProps> = ({ post, onDelete }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showReplies, setShowReplies] = useState(false);
-  const onDelete = async () => {
+  const onDeleteHandler = async () => {
     setIsLoading(true);
-    await fetchJson('DELETE', EApiEndpoints.POST, post._id.toString());
+    await fetchJson('DELETE', EApiEndpoints.POST, post._id);
     setIsLoading(false);
+    onDelete && onDelete(post._id);
   };
   return post.body ? (
     <Card id={`post_${post._id}`}>
@@ -82,7 +84,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
               onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
-                onDelete();
+                onDeleteHandler();
               }}
               type='button'
             >

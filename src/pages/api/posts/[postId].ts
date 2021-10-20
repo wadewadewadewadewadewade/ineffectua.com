@@ -67,7 +67,6 @@ handler.get((req, res) => {
 });
 
 handler.delete((req, res) => {
-  // TODO: verify req.user has permissions to perform actions
   if (req.user) {
     const postId = Array.isArray(req.query.postId)
       ? req.query.postId.join(', ')
@@ -77,7 +76,7 @@ handler.delete((req, res) => {
       .updateOne(
         {
           _id: new ObjectId(postId),
-          authorId: req.user._id,
+          author: { _id: req.user._id },
         },
         {
           $set: { deleted: new Date(Date.now()).toUTCString() },

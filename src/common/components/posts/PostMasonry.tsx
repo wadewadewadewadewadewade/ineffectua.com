@@ -3,14 +3,15 @@ import Masonry from '@mui/lab/Masonry';
 import MasonryItem from '@mui/lab/MasonryItem';
 import { useTheme } from '@mui/system';
 import { IPostWithReplies } from '../../types/IPost';
-import Post from './post/Post';
+import Post, { IPostProps } from './post/Post';
 import { useMediaQuery } from '@mui/material';
 
 interface IPostMasonry {
   posts: IPostWithReplies[];
+  onDelete?: IPostProps['onDelete'];
 }
 
-export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
+export const PostMasonry: React.FC<IPostMasonry> = ({ posts, onDelete }) => {
   const theme = useTheme();
   const postsLength = posts.length;
 
@@ -32,7 +33,7 @@ export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
     } else if (isXl) {
       return 4;
     }
-  }, [isXs, isSm, isMd, isLg, isXl]);
+  }, [isXs, isSm, isMd, isLg, isXl, postsLength]);
 
   return (
     <Masonry columns={breakpointCols} spacing={1} aria-label='posts'>
@@ -40,7 +41,7 @@ export const PostMasonry: React.FC<IPostMasonry> = ({ posts }) => {
         <MasonryItem
           key={post._id ? (post._id as unknown as string) : `post_${index}`}
         >
-          <Post post={post} />
+          <Post post={post} onDelete={onDelete} />
         </MasonryItem>
       ))}
     </Masonry>

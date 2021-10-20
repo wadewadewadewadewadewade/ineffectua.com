@@ -183,7 +183,19 @@ export const AddPost: React.FC<IAddPost> = props => {
         timeout='auto'
         sx={{ paddingLeft: 1, paddingRight: 1 }}
       >
-        {showReplies && <PostMasonry posts={replies || []} />}
+        {showReplies && (
+          <PostMasonry
+            posts={replies || []}
+            onDelete={
+              props.replies
+                ? _id =>
+                    setReplies(prevState =>
+                      prevState.filter(post => post._id !== _id),
+                    )
+                : undefined
+            }
+          />
+        )}
       </Collapse>
     </Card>
   );
