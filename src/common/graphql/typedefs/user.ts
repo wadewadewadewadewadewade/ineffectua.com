@@ -17,8 +17,4 @@ export const typeDefs: Config['typeDefs'] = gql`
     updatedAt: Date
     createdAt: Date!
   }
-
-  type Query {
-    currentUser: User
-  }
 `;

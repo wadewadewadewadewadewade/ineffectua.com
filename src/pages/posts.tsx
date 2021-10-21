@@ -5,11 +5,12 @@ import { IPostWithReplies } from '../common/types/IPost';
 import { GetServerSideProps } from 'next';
 import { RequireAuthentication } from '../common/components/users/RequireAuthentication';
 import { gql } from '@apollo/client';
-import client from '../common/utils/apollo-client';
+import { getStaticApolloClient } from '../common/utils/apollo-client';
 import { IUserProjection } from '../common/models/users/user';
+import { withApollo } from '@apollo/client/react/hoc';
 
 const posts_query = gql`
-  query Posts {
+  query posts {
     posts {
       _id
       author {
@@ -30,6 +31,7 @@ const user_query = gql`
 `;
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  const client = await getStaticApolloClient();
   const {
     data: { posts },
   } = await client.query({
@@ -52,7 +54,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-export default function Home({
+export function Home({
   posts,
   user,
 }: {
@@ -71,3 +73,5 @@ export default function Home({
     </RequireAuthentication>
   );
 }
+
+export default withApollo(Home);

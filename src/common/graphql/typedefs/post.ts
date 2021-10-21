@@ -9,12 +9,8 @@ export const typeDefs: Config['typeDefs'] = gql`
     _id: ID!
     author: PostAuthor!
     inReplyTo: ID
-    created: String!
-    deleted: String
+    createdAt: String!
+    deletedAt: String
     body: String!
-  }
-
-  type Query {
-    posts: [Post]!
   }
 `;

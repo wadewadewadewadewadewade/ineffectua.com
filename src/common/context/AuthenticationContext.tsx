@@ -1,27 +1,31 @@
 import { CircularProgress, Box } from '@mui/material';
 import React, { createContext } from 'react';
 import { IUserProjection } from '../models/users/user';
-import { useQuery } from '@apollo/client';
-import { gql } from 'apollo-server-micro';
-
-const CurrentUserQuery = gql`
-  query currentUser {
-    currentUser
-  }
-`;
+import { useMutation, useQuery } from '@apollo/client';
+import { SIGNOUT } from '../graphql/mutations/signout';
+import { GET_CURRENT_USER } from '../graphql/queries/currentUser';
 
 export const AuthenticationContext = createContext<
-  IUserProjection | false | true
+  (IUserProjection & { signout: () => Promise<void> }) | false | true
 >(true);
 AuthenticationContext.displayName = 'Authentication';
 
 export const AuthenticationContextProvider: React.FC = ({ children }) => {
-  const {
-    data: { user },
-    loading,
-  } = useQuery(CurrentUserQuery);
+  const { data, loading } = useQuery(GET_CURRENT_USER);
+  const [signout] = useMutation(SIGNOUT, {
+    onCompleted: data => console.log(data),
+  });
+  const user = data && data.currentUser ? data.currentUser : false;
   return (
-    <AuthenticationContext.Provider value={loading === true ? loading : user}>
+    <AuthenticationContext.Provider
+      value={
+        loading === true
+          ? loading
+          : user !== false
+          ? { ...AuthenticationContext, signout }
+          : user
+      }
+    >
       {loading ? (
         <Box
           sx={{

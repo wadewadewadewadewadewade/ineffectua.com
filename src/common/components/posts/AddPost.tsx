@@ -52,7 +52,7 @@ export const AddPost: React.FC<IAddPost> = props => {
       method({ body });
     };
   };
-  useEffect(() => {
+  /*useEffect(() => {
     const getReplies = async () => {
       const rep = await fetchJson(
         'GET',
@@ -62,7 +62,7 @@ export const AddPost: React.FC<IAddPost> = props => {
       setReplies(rep);
     };
     !passedReplies && getReplies();
-  }, [inReplyTo, passedReplies]);
+  }, [inReplyTo, passedReplies]);*/
   const onSubmit = async (data: IFormData) => {
     // ignore submissions with no body
     if (!data.body || data.body.length < 1) {

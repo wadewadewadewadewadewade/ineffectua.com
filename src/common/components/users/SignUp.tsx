@@ -12,7 +12,7 @@ import {
 import { Box } from '@mui/system';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { SIGNUP } from '../../models/mutations/signup';
+import { SIGNUP } from '../../graphql/mutations/signup';
 import { ICreateUserUser } from '../../models/users/user';
 
 interface IFormData extends ICreateUserUser {

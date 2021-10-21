@@ -1,5 +1,5 @@
-import { resolvers as PostResolvers } from './posts';
-import { resolvers as CurrentUserResolvers } from './currentuser';
+import Query from './queries';
+import Mutation from './mutations';
 import { GraphQLScalarType, Kind } from 'graphql';
 
 const dateScalar = new GraphQLScalarType({
@@ -19,4 +19,8 @@ const dateScalar = new GraphQLScalarType({
   },
 });
 
-export default { ...PostResolvers, ...CurrentUserResolvers, Date: dateScalar };
+export default {
+  Date: dateScalar,
+  Query,
+  Mutation,
+};

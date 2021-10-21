@@ -2,13 +2,13 @@ import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import { ApolloProvider } from '@apollo/client';
-import client from '../common/utils/apollo-client';
 import { AuthenticationContextProvider } from '../common/context/AuthenticationContext';
 import { ThemeProvider } from '@mui/material';
 import theme from '../theme';
 import { SiteAppBar } from '../common/components/navigation/SiteAppBar';
 import styles from '../styles/global.module.scss';
 import '../styles/global.css';
+import { client } from '../common/utils/apollo-client';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

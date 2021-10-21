@@ -12,7 +12,7 @@ import { Box } from '@mui/system';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
-import { SIGNIN } from '../../models/mutations/signin';
+import { SIGNIN } from '../../graphql/mutations/signin';
 
 interface IFormData {
   email: string;

@@ -1,3 +1,4 @@
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { Config } from 'apollo-server-micro';
 import { ContextFunction } from 'apollo-server-micro/node_modules/apollo-server-core';
 import { UserProjection } from './../models/users/user';
@@ -115,6 +116,7 @@ export const apolloServerMongoDB = (
 ): Config => ({
   typeDefs,
   resolvers,
+  schema: makeExecutableSchema({ typeDefs, resolvers }),
   context: async ctx => {
     if (!dbObject.db) {
       if (!client.isConnected) await client.connect();

@@ -5,8 +5,8 @@ const PostProjectionRecord: Record<keyof IPost, 0 | 1> = {
   _id: 1,
   author: 1,
   inReplyTo: 1,
-  created: 1,
-  deleted: 0,
+  createdAt: 1,
+  deletedAt: 0,
   body: 1,
 };
 
@@ -14,8 +14,8 @@ export interface IPost {
   _id: string;
   author: Pick<IUser, '_id'> & Partial<Pick<IUser, 'username' | 'image'>>;
   inReplyTo?: string;
-  created: Date;
-  deleted?: Date;
+  createdAt: Date;
+  deletedAt?: Date;
   body: string;
 }
 

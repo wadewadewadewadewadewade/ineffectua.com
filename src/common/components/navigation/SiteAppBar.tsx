@@ -44,8 +44,11 @@ export const SiteAppBar: React.FC = () => {
   if (authentication === true) {
     return null;
   }
-  const isAuthenticated = 'isAuthenticated' in authentication ? false : true;
-  const logout = 'logout' in authentication ? authentication.logout : undefined;
+  const isAuthenticated = typeof authentication !== 'boolean';
+  const signout =
+    typeof authentication !== 'boolean' && 'signout' in authentication
+      ? authentication.signout
+      : undefined;
   return (
     <AppBar>
       <Toolbar>
@@ -80,8 +83,8 @@ export const SiteAppBar: React.FC = () => {
             }}
             menuItems={[
               {
-                name: 'logout',
-                onClose: logout,
+                name: 'signout',
+                onClose: signout,
                 children: (
                   <>
                     <Logout sx={{ marginRight: 1 }} />

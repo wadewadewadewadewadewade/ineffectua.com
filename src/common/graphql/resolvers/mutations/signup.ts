@@ -1,9 +1,12 @@
-import { createOrGetExistingUser, ICreateUserUser } from './../users/user';
+import {
+  createOrGetExistingUser,
+  ICreateUserUser,
+} from '../../../models/users/user';
 import Cryptr from 'cryptr';
-import { TCookieMethod } from '../../utils/cookies';
+import { TCookieMethod } from '../../../utils/cookies';
 import { Db } from 'mongodb';
 
-export function signup(
+export function signUp(
   _,
   data: ICreateUserUser,
   ctx: { cookie: TCookieMethod; db: Db },

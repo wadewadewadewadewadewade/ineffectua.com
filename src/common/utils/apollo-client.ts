@@ -1,10 +1,18 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
-const uri = `${process.env.HOSTNAME_AND_PORT}/api/graphql`;
+const uri = `${process.env.HOSTNAME_AND_PORT}/api/graphql`.replace(
+  'undefined',
+  '',
+);
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   uri,
   cache: new InMemoryCache(),
 });
 
-export default client;
+export async function getStaticApolloClient() {
+  return new ApolloClient({
+    uri,
+    cache: new InMemoryCache(),
+  });
+}
