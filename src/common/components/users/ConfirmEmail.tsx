@@ -6,7 +6,7 @@ export const ConfirmEmail: React.FC = () => {
   const userContext = useContext(AuthenticationContext);
   const isUserLoading = userContext === true;
   const sendConfirmationEmail =
-    userContext !== true && 'sendConfirmationEmail' in userContext
+    typeof userContext !== 'boolean' && 'sendConfirmationEmail' in userContext
       ? userContext.sendConfirmationEmail
       : undefined;
   const [isSent, setIsSent] = useState(false);

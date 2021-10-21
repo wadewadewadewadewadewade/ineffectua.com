@@ -33,18 +33,18 @@ const typeDefs: Config['typeDefs'] = gql`
 
   type Query {
     currentUser: User
-    posts(skip: Int, inReplyTo: String, userId: String): [Post]!
+    getPosts(skip: Int, inReplyTo: String, userId: String): [Post]!
   }
 
   type Mutation {
-    signin(email: String!, password: String!): User
-    signup(
+    signIn(email: String!, password: String!): User
+    signUp(
       email: String!
       password: String!
       username: String!
       name: String
     ): User
-    signout: Boolean
+    signOut: Boolean
   }
 `;
 

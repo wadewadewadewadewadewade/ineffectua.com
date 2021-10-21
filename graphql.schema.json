@@ -54,7 +54,7 @@
         "description": null,
         "fields": [
           {
-            "name": "signin",
+            "name": "signIn",
             "description": null,
             "args": [
               {
@@ -99,7 +99,7 @@
             "deprecationReason": null
           },
           {
-            "name": "signout",
+            "name": "signOut",
             "description": null,
             "args": [],
             "type": {
@@ -111,7 +111,7 @@
             "deprecationReason": null
           },
           {
-            "name": "signup",
+            "name": "signUp",
             "description": null,
             "args": [
               {
@@ -333,7 +333,7 @@
             "deprecationReason": null
           },
           {
-            "name": "posts",
+            "name": "getPosts",
             "description": null,
             "args": [
               {

@@ -6,7 +6,12 @@ import { SIGNOUT } from '../graphql/mutations/signout';
 import { GET_CURRENT_USER } from '../graphql/queries/currentUser';
 
 export const AuthenticationContext = createContext<
-  (IUserProjection & { signout: () => Promise<void> }) | false | true
+  | (IUserProjection & {
+      signout: () => Promise<void>;
+      sendConfirmationEmail?: () => Promise<void>;
+    })
+  | false
+  | true
 >(true);
 AuthenticationContext.displayName = 'Authentication';
 

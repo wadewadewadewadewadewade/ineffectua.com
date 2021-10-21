@@ -25,19 +25,19 @@ export type AdditionalEntityFields = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  signin?: Maybe<User>;
-  signout?: Maybe<Scalars['Boolean']>;
-  signup?: Maybe<User>;
+  signIn?: Maybe<User>;
+  signOut?: Maybe<Scalars['Boolean']>;
+  signUp?: Maybe<User>;
 };
 
 
-export type MutationSigninArgs = {
+export type MutationSignInArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
 
 
-export type MutationSignupArgs = {
+export type MutationSignUpArgs = {
   email: Scalars['String'];
   name?: Maybe<Scalars['String']>;
   password: Scalars['String'];
@@ -62,11 +62,11 @@ export type PostAuthor = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
-  posts: Array<Maybe<Post>>;
+  getPosts: Array<Maybe<Post>>;
 };
 
 
-export type QueryPostsArgs = {
+export type QueryGetPostsArgs = {
   inReplyTo?: Maybe<Scalars['String']>;
   skip?: Maybe<Scalars['Int']>;
   userId?: Maybe<Scalars['String']>;
@@ -92,24 +92,24 @@ export type PostInfoFragment = { __typename: 'Post', _id: string, createdAt: str
 
 export type UserInfoFragment = { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any };
 
-export type SignoutMutationVariables = Exact<{ [key: string]: never; }>;
+export type SignOutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SignoutMutation = { __typename?: 'Mutation', signout?: boolean | null | undefined };
+export type SignOutMutation = { __typename?: 'Mutation', signOut?: boolean | null | undefined };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any } | null | undefined };
 
-export type PostsQueryVariables = Exact<{
+export type GetPostsQueryVariables = Exact<{
   skip?: Maybe<Scalars['Int']>;
   inReplyTo?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['String']>;
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename: 'Post', _id: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } } | null | undefined> };
+export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename: 'Post', _id: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } } | null | undefined> };
 
 
 
@@ -260,9 +260,9 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  signin?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSigninArgs, 'email' | 'password'>>;
-  signout?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  signup?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
+  signIn?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
+  signOut?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  signUp?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'password' | 'username'>>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
@@ -282,7 +282,7 @@ export type PostAuthorResolvers<ContextType = any, ParentType extends ResolversP
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  posts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType, RequireFields<QueryPostsArgs, never>>;
+  getPosts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType, RequireFields<QueryGetPostsArgs, never>>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -347,36 +347,36 @@ export const UserInfoFragmentDoc = gql`
   createdAt
 }
     `;
-export const SignoutDocument = gql`
-    mutation signout {
-  signout
+export const SignOutDocument = gql`
+    mutation signOut {
+  signOut
 }
     `;
-export type SignoutMutationFn = Apollo.MutationFunction<SignoutMutation, SignoutMutationVariables>;
+export type SignOutMutationFn = Apollo.MutationFunction<SignOutMutation, SignOutMutationVariables>;
 
 /**
- * __useSignoutMutation__
+ * __useSignOutMutation__
  *
- * To run a mutation, you first call `useSignoutMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSignoutMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSignOutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignOutMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [signoutMutation, { data, loading, error }] = useSignoutMutation({
+ * const [signOutMutation, { data, loading, error }] = useSignOutMutation({
  *   variables: {
  *   },
  * });
  */
-export function useSignoutMutation(baseOptions?: Apollo.MutationHookOptions<SignoutMutation, SignoutMutationVariables>) {
+export function useSignOutMutation(baseOptions?: Apollo.MutationHookOptions<SignOutMutation, SignOutMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SignoutMutation, SignoutMutationVariables>(SignoutDocument, options);
+        return Apollo.useMutation<SignOutMutation, SignOutMutationVariables>(SignOutDocument, options);
       }
-export type SignoutMutationHookResult = ReturnType<typeof useSignoutMutation>;
-export type SignoutMutationResult = Apollo.MutationResult<SignoutMutation>;
-export type SignoutMutationOptions = Apollo.BaseMutationOptions<SignoutMutation, SignoutMutationVariables>;
+export type SignOutMutationHookResult = ReturnType<typeof useSignOutMutation>;
+export type SignOutMutationResult = Apollo.MutationResult<SignOutMutation>;
+export type SignOutMutationOptions = Apollo.BaseMutationOptions<SignOutMutation, SignOutMutationVariables>;
 export const CurrentUserDocument = gql`
     query currentUser {
   currentUser {
@@ -411,25 +411,25 @@ export function useCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
 export type CurrentUserQueryResult = Apollo.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
-export const PostsDocument = gql`
-    query posts($skip: Int, $inReplyTo: String, $userId: String) {
-  posts(skip: $skip, inReplyTo: $inReplyTo, userId: $userId) {
+export const GetPostsDocument = gql`
+    query getPosts($skip: Int, $inReplyTo: String, $userId: String) {
+  getPosts(skip: $skip, inReplyTo: $inReplyTo, userId: $userId) {
     ...PostInfo
   }
 }
     ${PostInfoFragmentDoc}`;
 
 /**
- * __usePostsQuery__
+ * __useGetPostsQuery__
  *
- * To run a query within a React component, call `usePostsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = usePostsQuery({
+ * const { data, loading, error } = useGetPostsQuery({
  *   variables: {
  *      skip: // value for 'skip'
  *      inReplyTo: // value for 'inReplyTo'
@@ -437,24 +437,24 @@ export const PostsDocument = gql`
  *   },
  * });
  */
-export function usePostsQuery(baseOptions?: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>) {
+export function useGetPostsQuery(baseOptions?: Apollo.QueryHookOptions<GetPostsQuery, GetPostsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+        return Apollo.useQuery<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, options);
       }
-export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostsQuery, PostsQueryVariables>) {
+export function useGetPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPostsQuery, GetPostsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+          return Apollo.useLazyQuery<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, options);
         }
-export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
-export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
-export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
+export type GetPostsQueryHookResult = ReturnType<typeof useGetPostsQuery>;
+export type GetPostsLazyQueryHookResult = ReturnType<typeof useGetPostsLazyQuery>;
+export type GetPostsQueryResult = Apollo.QueryResult<GetPostsQuery, GetPostsQueryVariables>;
 import { ObjectID } from 'mongodb';
 
 declare module '*/posts.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const PostInfo: DocumentNode;
-export const posts: DocumentNode;
+export const getPosts: DocumentNode;
 
   export default defaultDocument;
 }
@@ -472,7 +472,7 @@ declare module '*/user.ts' {
 declare module '*/signout.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
-  export const signout: DocumentNode;
+  export const signOut: DocumentNode;
 
   export default defaultDocument;
 }
@@ -512,9 +512,9 @@ export const UserInfo = gql`
   createdAt
 }
     `;
-export const Signout = gql`
-    mutation signout {
-  signout
+export const SignOut = gql`
+    mutation signOut {
+  signOut
 }
     `;
 export const CurrentUser = gql`
@@ -524,9 +524,9 @@ export const CurrentUser = gql`
   }
 }
     ${UserInfo}`;
-export const Posts = gql`
-    query posts($skip: Int, $inReplyTo: String, $userId: String) {
-  posts(skip: $skip, inReplyTo: $inReplyTo, userId: $userId) {
+export const GetPosts = gql`
+    query getPosts($skip: Int, $inReplyTo: String, $userId: String) {
+  getPosts(skip: $skip, inReplyTo: $inReplyTo, userId: $userId) {
     ...PostInfo
   }
 }
