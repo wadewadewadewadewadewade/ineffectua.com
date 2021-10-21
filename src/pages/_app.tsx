@@ -1,6 +1,8 @@
 import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
+import { ApolloProvider } from '@apollo/client';
+import client from '../common/utils/apollo-client';
 import { AuthenticationContextProvider } from '../common/context/AuthenticationContext';
 import { ThemeProvider } from '@mui/material';
 import theme from '../theme';
@@ -19,32 +21,34 @@ function MyApp({ Component, pageProps }: AppProps) {
           rel='stylesheet'
         />
       </Head>
-      <ThemeProvider theme={theme}>
-        <AuthenticationContextProvider>
-          <div className={styles.container}>
-            <SiteAppBar />
+      <ApolloProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <AuthenticationContextProvider>
+            <div className={styles.container}>
+              <SiteAppBar />
 
-            <main className={styles.main}>
-              <Component {...pageProps} />
-            </main>
+              <main className={styles.main}>
+                <Component {...pageProps} />
+              </main>
 
-            <footer className={styles.footer}>
-              <a
-                href='https://vercel.com'
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                Powered by{' '}
-                <img
-                  src='/vercel.svg'
-                  alt='Vercel Logo'
-                  className={styles.logo}
-                />
-              </a>
-            </footer>
-          </div>
-        </AuthenticationContextProvider>
-      </ThemeProvider>
+              <footer className={styles.footer}>
+                <a
+                  href='https://vercel.com'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  Powered by{' '}
+                  <img
+                    src='/vercel.svg'
+                    alt='Vercel Logo'
+                    className={styles.logo}
+                  />
+                </a>
+              </footer>
+            </div>
+          </AuthenticationContextProvider>
+        </ThemeProvider>
+      </ApolloProvider>
     </>
   );
 }

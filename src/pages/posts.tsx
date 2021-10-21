@@ -2,39 +2,50 @@ import React from 'react';
 import { useRouter } from 'next/dist/client/router';
 import AddPost from '../common/components/posts/AddPost';
 import { IPostWithReplies } from '../common/types/IPost';
-import fetchJson, { EApiEndpoints } from '../common/utils/fetcher';
 import { GetServerSideProps } from 'next';
-import { TVerifyUserResponse } from './api/auth';
 import { RequireAuthentication } from '../common/components/users/RequireAuthentication';
+import { gql } from '@apollo/client';
+import client from '../common/utils/apollo-client';
+import { IUserProjection } from '../common/models/users/user';
 
-type THeaders = [string, string];
+const posts_query = gql`
+  query Posts {
+    posts {
+      _id
+      author {
+        _id
+      }
+      created
+      body
+    }
+  }
+`;
 
-export const getServerSideProps: GetServerSideProps = async context => {
-  const isHeaders = (obj: [key: string, val: string]): obj is THeaders =>
-    typeof obj[1] === 'string';
-  const contextHeadersArray: THeaders[] = Object.entries(
-    context.req.headers,
-  ).filter(isHeaders);
-  const contextHeaders: Record<string, string> = contextHeadersArray.reduce(
-    (acc, obj) => ({ ...acc, [obj[0]]: obj[1] }),
-    {},
-  );
-  const user: TVerifyUserResponse = await fetchJson(
-    'GET',
-    EApiEndpoints.VERIFY,
-    undefined,
-    undefined,
-    {
-      ...contextHeaders,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-  );
-  const posts = await fetchJson('GET', EApiEndpoints.POSTS);
+const user_query = gql`
+  query currentUser {
+    currentUser {
+      _id
+    }
+  }
+`;
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const {
+    data: { posts },
+  } = await client.query({
+    query: posts_query,
+  });
+  const {
+    data: { currentUser },
+  } = await client.query({
+    query: user_query,
+  });
   return {
     props: {
       posts,
-      user,
+      user: currentUser,
+      // this hydrates the clientside Apollo cache in the `withApollo` HOC
+      apolloStaticCache: client.cache.extract(),
       fallback: 'blocking',
       revalidate: 1,
     },
@@ -46,7 +57,7 @@ export default function Home({
   user,
 }: {
   posts: IPostWithReplies[];
-  user: TVerifyUserResponse;
+  user: IUserProjection | false;
 }) {
   const router = useRouter();
   return (

@@ -2,21 +2,20 @@ import { Db, FindOptions, ObjectId } from 'mongodb';
 import { IPostWithReplies } from '../../types/IPost';
 import { IPost } from '../posts/post';
 import { SHA256 } from 'crypto-js';
-import { TVerifyUserResponse } from '../../../pages/api/auth';
 
 export interface IUser {
   _id: string;
-  name: string;
+  name?: string;
   username: string;
   email: string;
   password: string;
-  image: string;
-  locked: boolean;
+  image?: string;
+  locked?: boolean;
   isConfirmed: boolean;
-  lastActiveAt: string;
-  confirmedAt: string;
-  updatedAt: string;
-  createdAt: string;
+  lastActiveAt: Date;
+  confirmedAt?: Date;
+  updatedAt?: Date;
+  createdAt: Date;
 }
 
 export type IUserProjection = Omit<
@@ -57,7 +56,7 @@ export const getUser = async (
 export interface ICreateUserUser {
   email: IUser['email'];
   password: string;
-  username?: IUser['username'];
+  username: IUser['username'];
   name?: IUser['name'];
 }
 
@@ -78,7 +77,7 @@ export const createOrGetExistingUser = async (
   if (existingUser) {
     return existingUser;
   }
-  const createdAt = new Date(Date.now()).toUTCString();
+  const createdAt = new Date(Date.now());
   const result = await db
     .collection<Partial<Omit<IUser, '_id'>>>('users')
     .insertOne({
@@ -104,7 +103,7 @@ export const createOrGetExistingUser = async (
 export const getExistingUser = async (
   db: Db,
   user: ICreateUserUser,
-): Promise<TVerifyUserResponse> => {
+): Promise<IUserProjection | false> => {
   const passwordEncoded = SHA256(user.password).toString();
   const existingUser: IUserProjection | false = await db
     .collection<IUserProjection>('users')
@@ -118,7 +117,7 @@ export const getExistingUser = async (
   if (existingUser) {
     return existingUser;
   }
-  return { isAuthenticated: false };
+  return false;
 };
 
 export const getUsersForPosts = (
@@ -137,7 +136,7 @@ export const getUsersForPosts = (
               } else {
                 posts.push({
                   ...dbPost,
-                  author: { _id: r._id, name: r.name, image: r.image },
+                  author: { _id: r._id, username: r.username, image: r.image },
                 });
                 response();
               }

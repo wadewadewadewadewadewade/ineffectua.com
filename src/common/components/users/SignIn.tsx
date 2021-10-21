@@ -9,9 +9,10 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import AuthenticationContext from '../../context/AuthenticationContext';
+import { useMutation } from '@apollo/client';
+import { SIGNIN } from '../../models/mutations/signin';
 
 interface IFormData {
   email: string;
@@ -24,15 +25,11 @@ interface ISignIn {
 }
 
 export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
-  const authentication = useContext(AuthenticationContext);
-  const signIn =
-    authentication !== true && 'signIn' in authentication
-      ? authentication.signIn
-      : undefined;
   const {
     handleSubmit,
     control,
     formState: { errors },
+    watch,
   } = useForm<IFormData>({
     defaultValues: {
       email: '',
@@ -40,10 +37,14 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
       password_confirm: '',
     },
   });
+  const email = watch('email');
+  const password = watch('email');
+  const [handleSignin] = useMutation(SIGNIN, {
+    variables: { email, password },
+    onCompleted: data => console.log(data),
+  });
   const onSubmit = async (data: IFormData) => {
-    if (signIn) {
-      await signIn(data.email, data.password);
-    }
+    handleSignin();
   };
   return (
     <Box

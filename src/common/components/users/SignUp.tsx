@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client';
 import {
   Button,
   FormControl,
@@ -9,9 +10,9 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import AuthenticationContext from '../../context/AuthenticationContext';
+import { SIGNUP } from '../../models/mutations/signup';
 import { ICreateUserUser } from '../../models/users/user';
 
 interface IFormData extends ICreateUserUser {
@@ -23,11 +24,6 @@ interface ISignUp {
 }
 
 export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
-  const authentication = useContext(AuthenticationContext);
-  const signUp =
-    authentication !== true && 'signUp' in authentication
-      ? authentication.signUp
-      : undefined;
   const {
     handleSubmit,
     control,
@@ -42,10 +38,14 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
       password_confirm: '',
     },
   });
+  const [handleSignup] = useMutation(SIGNUP, {
+    variables: watch(),
+    onCompleted: data => console.log(data),
+  });
   const passwordConfirm = watch('password_confirm');
   const onSubmit = async (data: IFormData) => {
-    if (!!signUp && data.password === data.password_confirm) {
-      await signUp(data);
+    if (data.password === data.password_confirm) {
+      handleSignup();
     }
   };
   return (

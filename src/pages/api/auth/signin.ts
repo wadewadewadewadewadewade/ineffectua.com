@@ -22,7 +22,7 @@ handler.post(async (req, res) => {
       res.json(rest);
     });
   }
-  res.json('A user with that email address or password not found');
+  res.json({ message: 'A user with that email address or password not found' });
 });
 
 export default handler;
