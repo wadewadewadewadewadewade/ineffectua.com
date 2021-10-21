@@ -1,0 +1,17 @@
+overwrite: true
+schema: 'src/common/graphql/typedefs/index.ts'
+documents: 'src/**/*.{tsx,ts}'
+generates:
+  src/common/graphql/types.generated.d.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-resolvers'
+      - 'typescript-react-apollo'
+      - 'typescript-mongodb'
+      - 'typescript-graphql-files-modules'
+      - 'typescript-document-nodes'
+      - 'fragment-matcher'
+  ./graphql.schema.json:
+    plugins:
+      - 'introspection'

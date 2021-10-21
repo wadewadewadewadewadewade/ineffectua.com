@@ -7,6 +7,6 @@ export const SIGNUP = gql`
     $username: String!
     $name: String
   ) {
-    signup(email: $email, password: $password, username: $username, name: $name)
+    signup(email: $email, password: $password, username: $username, name: $name) { ... }
   }
 `;
