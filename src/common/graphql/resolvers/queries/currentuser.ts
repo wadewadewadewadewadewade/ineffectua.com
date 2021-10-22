@@ -6,6 +6,5 @@ export const currentUser = async (
   _context: { user: IUserProjection | undefined },
   _info,
 ): Promise<IUserProjection | false> => {
-  console.log('resolver');
   return _context.user || undefined;
 };

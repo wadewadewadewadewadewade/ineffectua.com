@@ -4,14 +4,14 @@ import AddPost from '../common/components/posts/AddPost';
 import { IPostWithReplies } from '../common/types/IPost';
 import { GetServerSideProps } from 'next';
 import { RequireAuthentication } from '../common/components/users/RequireAuthentication';
-import { getStaticApolloClient } from '../common/utils/apollo-client';
 import { IUserProjection } from '../common/models/users/user';
-import { withApollo } from '@apollo/client/react/hoc';
 import { GET_CURRENT_USER } from '../common/graphql/queries/currentUser';
 import { GET_POSTS } from '../common/graphql/queries/posts';
+import withApollo from '../common/components/withApollo';
+import { initApolloClient } from '../common/services/apollo';
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const client = await getStaticApolloClient();
+  const client = await initApolloClient({});
   const {
     data: { currentUser },
   } = await client.query({

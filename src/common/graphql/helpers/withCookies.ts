@@ -38,7 +38,7 @@ const cookie = (
 /**
  * Adds `cookie` function on `res.cookie` to set cookies for response
  */
-const cookies =
+const withCookies =
   (handler: NextApiHandler) =>
   (
     req: NextApiRequest,
@@ -52,4 +52,4 @@ const cookies =
     return handler(req, res);
   };
 
-export default cookies;
+export default withCookies;

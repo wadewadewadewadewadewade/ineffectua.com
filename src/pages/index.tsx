@@ -6,7 +6,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
       fallback: 'blocking',
-      revalidate: 1,
     },
   };
 };

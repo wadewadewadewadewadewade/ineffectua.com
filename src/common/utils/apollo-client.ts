@@ -9,10 +9,3 @@ export const client = new ApolloClient({
   uri,
   cache: new InMemoryCache(),
 });
-
-export async function getStaticApolloClient() {
-  return new ApolloClient({
-    uri,
-    cache: new InMemoryCache(),
-  });
-}
