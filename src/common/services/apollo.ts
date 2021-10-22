@@ -1,3 +1,4 @@
+import { ineffectuaDb } from './../utils/mongodb';
 import {
   ApolloClient,
   InMemoryCache,
@@ -6,11 +7,10 @@ import {
   ServerError,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import schema from '../../../graphql.schema.json';
+import schema from '../graphql/schema';
 
 // ensure that queries can run on the server during SSR and SSG
-// @ts-ignore
-global.fetch = require('node-fetch');
+//global.fetch = require('node-fetch');
 let globalApolloClient = null;
 
 const uri = `${process.env.HOSTNAME_AND_PORT}/api/graphql`.replace(
@@ -24,7 +24,10 @@ function createIsomorphLink() {
     // in order to make sure that we're not shipping server-side code to the client
     // eslint-disable-next-line
     const { SchemaLink } = require('@apollo/link-schema');
-    return new SchemaLink({ schema, context: { cookie: null } });
+    return new SchemaLink({
+      schema,
+      context: { db: ineffectuaDb, cookie: null, user: false },
+    });
   } else {
     return new HttpLink({
       uri,
@@ -59,7 +62,7 @@ const link = ApolloLink.from([errorLink, createIsomorphLink()]);
 
 export function createApolloClient(initialState = {}) {
   const ssrMode = typeof window === 'undefined';
-  const cache = new InMemoryCache({
+  const cache = new InMemoryCache(/*{
     typePolicies: {
       Bookmark: {
         keyFields: ['url'],
@@ -70,7 +73,7 @@ export function createApolloClient(initialState = {}) {
         },
       },
     },
-  }).restore(initialState);
+  }*/).restore(initialState);
 
   return new ApolloClient({
     ssrMode,

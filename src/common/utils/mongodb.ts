@@ -17,6 +17,11 @@ const client = new MongoClient(process.env.MONGODB_URI) as MongoClient & {
   isConnected: boolean;
 };
 
+export const ineffectuaDb = async () => {
+  if (!client.isConnected) await client.connect();
+  return client.db(process.env.MONGODB_DB);
+};
+
 export interface INextApiRequestWithDB extends NextApiRequest {
   dbClient: MongoClient;
   db: Db;

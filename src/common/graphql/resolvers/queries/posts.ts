@@ -1,6 +1,6 @@
 import { Db } from 'mongodb';
 import { IPost, PostProjection } from '../../../models/posts/post';
-import { getUsersForPosts } from '../../../models/users/user';
+import { getUsersForPosts, IUserProjection } from '../../../models/users/user';
 
 export const getPosts = async (
   _parent,
@@ -10,16 +10,15 @@ export const getPosts = async (
     skip?: number;
     userId?: string;
   },
-  _context: { db: Db },
+  _context: { user?: IUserProjection; db: () => Promise<Db> },
 ): Promise<Omit<IPost, 'deletedAt'>[]> => {
-  console.log('posts', _context);
-  const databasePosts = await _context.db
+  const db = await _context.db();
+  const databasePosts = await db
     .collection<IPost>('posts')
     .find({ ..._args, isDeleted: undefined }, PostProjection)
     .sort({ created: -1 })
     .toArray();
   const posts: IPost[] = [];
-  await getUsersForPosts(_context.db, databasePosts, posts);
-  console.log('posts', { databasePosts, posts });
+  await getUsersForPosts(db, databasePosts, posts);
   return posts;
 };

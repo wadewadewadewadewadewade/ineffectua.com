@@ -2,6 +2,7 @@ import { ContextFunction } from 'apollo-server-micro/node_modules/apollo-server-
 import Cryptr from 'cryptr';
 import { NextApiRequest } from 'next';
 import { IUserProjection } from '../../models/users/user';
+import { ineffectuaDb } from '../../utils/mongodb';
 
 if (!process.env.ENCRYPTION_TOKEN) {
   throw new Error('Please add your Encryption Token to .env.local');
@@ -28,6 +29,7 @@ export const context: ContextFunction = ctx => {
     cookie: ctx.res.cookie,
     // allow queries and mutations to look for an `isMe` boolean in the context object
     user: isAuthenticated(ctx.req),
+    db: ineffectuaDb,
   };
 };
 

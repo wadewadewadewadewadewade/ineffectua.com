@@ -22,13 +22,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
   } = await client.query({
     query: GET_POSTS,
   });
-
   return {
     props: {
-      posts,
-      user: currentUser,
+      posts: posts || [],
+      user: currentUser || false,
       // this hydrates the clientside Apollo cache in the `withApollo` HOC
-      apolloStaticCache: client.cache.extract(),
+      //apolloStaticCache: client.cache.extract(),
       fallback: 'blocking',
       revalidate: 1,
     },
@@ -44,15 +43,18 @@ export function Home({
 }) {
   const router = useRouter();
   return (
-    <RequireAuthentication user={user}>
-      <AddPost
-        onPost={() => {
-          router.replace(router.asPath);
-        }}
-        replies={posts}
-      />
-    </RequireAuthentication>
+    <>
+      <RequireAuthentication user={user}>
+        {/*<AddPost
+          onPost={() => {
+            router.replace(router.asPath);
+          }}
+          replies={posts}
+        />*/}
+      </RequireAuthentication>
+    </>
   );
 }
 
-export default withApollo(Home);
+export default Home;
+//export default withApollo(Home);
