@@ -1,7 +1,8 @@
-import { Db, FindOptions, ObjectId } from 'mongodb';
+import { FindOptions, ObjectId } from 'mongodb';
 import { IPostWithReplies } from '../../types/IPost';
 import { IPost } from '../posts/post';
 import { SHA256 } from 'crypto-js';
+import { ineffectuaDb } from '../../utils/mongodb';
 
 export interface IUser {
   _id: string;
@@ -38,13 +39,66 @@ export const UserProjectionRecord: Record<keyof IUser, 0 | 1> = {
   createdAt: 0,
 };
 
+export const serealizeUser = (user: IUserProjection | false): string => {
+  if (user === false) {
+    return JSON.stringify(user);
+  }
+  const userObject = {};
+  Object.keys(user).forEach(key => {
+    const value = user[key];
+    switch (typeof value) {
+      case 'object':
+        if ('getTime' in value) {
+          userObject[key] = value.getTime();
+        } else {
+          userObject[key] = value;
+        }
+        break;
+      default:
+        userObject[key] = value;
+    }
+  });
+  return JSON.stringify(userObject);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isNumeric(n: any) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+export const deserealizeUser = (userString: string): IUserProjection => {
+  const userObject = JSON.parse(userString);
+  const keys = Object.keys(userObject);
+  const dateKeys = [
+    'isConfirmed',
+    'lastActiveAt',
+    'confirmedAt',
+    'updatedAt',
+    'createdAt',
+  ];
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const value = userObject[key];
+    if (
+      dateKeys.includes(key) &&
+      (typeof value === 'number' ||
+        (typeof value === 'string' && isNumeric(value)))
+    ) {
+      userObject[key] = new Date(
+        typeof value === 'string' ? parseInt(value, 10) : value,
+      );
+    }
+  }
+  return userObject;
+};
+
 export const UserProjection = UserProjectionRecord as FindOptions<IUser>;
 
 export const getUser = async (
-  db: Db,
   _id?: IUser['_id'],
 ): Promise<IUserProjection | false> => {
   if (_id) {
+    const db = await ineffectuaDb();
     const user = await db
       .collection<IUser>('users')
       .findOne({ _id: new ObjectId(_id) }, UserProjection);
@@ -61,10 +115,10 @@ export interface ICreateUserUser {
 }
 
 export const createOrGetExistingUser = async (
-  db: Db,
   user: ICreateUserUser,
 ): Promise<IUserProjection> => {
   const passwordEncoded = SHA256(user.password).toString();
+  const db = await ineffectuaDb();
   const existingUser: IUserProjection | false = await db
     .collection<IUserProjection>('users')
     .findOne(
@@ -101,9 +155,9 @@ export const createOrGetExistingUser = async (
 };
 
 export const getExistingUser = async (
-  db: Db,
   user: ICreateUserUser,
 ): Promise<IUserProjection | false> => {
+  const db = await ineffectuaDb();
   const passwordEncoded = SHA256(user.password).toString();
   const existingUser: IUserProjection | false = await db
     .collection<IUserProjection>('users')
@@ -120,8 +174,7 @@ export const getExistingUser = async (
   return false;
 };
 
-export const getUsersForPosts = (
-  db: Db,
+export const getUsersForPosts = async (
   databasePosts: IPost[],
   posts: IPostWithReplies[],
 ): Promise<void[]> =>
@@ -130,7 +183,7 @@ export const getUsersForPosts = (
       dbPost =>
         new Promise<void>((response, reject) => {
           try {
-            getUser(db, dbPost.author._id).then(r => {
+            getUser(dbPost.author._id).then(r => {
               if (r === false) {
                 reject(r);
               } else {

@@ -1,29 +1,22 @@
-import { IUserProjection } from '../../../models/users/user';
 import Cryptr from 'cryptr';
+import { serealizeUser } from '../../../models/users/user';
 import { validateUser } from '../../../utils/mongodb';
 import { TCookieMethod } from '../../helpers/withCookies';
 
-export function signIn(
+export async function signIn(
   _,
   { email, password }: { email: string; password: string },
   ctx: { cookie: TCookieMethod },
 ) {
   const { cookie } = ctx;
 
-  let user: Partial<IUserProjection> = undefined;
-  let error = undefined;
-  validateUser(undefined, email, password, (err, u) => {
-    user = u;
-    error = err;
-  });
-  if (error) {
-    console.error(error);
-    return false;
-  }
+  const user = await validateUser(email, password);
 
   const secret = process.env.ENCRYPTION_TOKEN;
   const cryptr = new Cryptr(secret);
-  const encrypted = cryptr.encrypt(JSON.stringify(user));
+  const encrypted = cryptr.encrypt(
+    !user ? JSON.stringify(user) : serealizeUser(user),
+  );
 
   // the password is correct, set a cookie on the response
   cookie('session', encrypted, {
@@ -36,5 +29,5 @@ export function signIn(
   });
 
   // tell the mutation that login was successful
-  return true;
+  return user;
 }

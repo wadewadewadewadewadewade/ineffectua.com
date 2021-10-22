@@ -39,13 +39,12 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
     },
   });
   const [handleSignup] = useMutation(SIGNUP, {
-    variables: watch(),
-    onCompleted: data => console.log(data),
+    refetchQueries: ['currentUser'],
   });
   const passwordConfirm = watch('password_confirm');
-  const onSubmit = async (data: IFormData) => {
-    if (data.password === data.password_confirm) {
-      handleSignup();
+  const onSubmit = async (variables: IFormData) => {
+    if (variables.password === variables.password_confirm) {
+      handleSignup({ variables });
     }
   };
   return (

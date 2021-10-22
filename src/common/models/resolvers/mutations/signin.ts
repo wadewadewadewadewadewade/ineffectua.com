@@ -1,25 +1,15 @@
 import { TCookieMethod } from './../../../graphql/helpers/withCookies';
-import { IUserProjection } from '../../users/user';
 import Cryptr from 'cryptr';
 import { validateUser } from '../../../utils/mongodb';
 
-export function signIn(
+export async function signIn(
   _,
   { email, password }: { email: string; password: string },
   ctx: { cookie: TCookieMethod },
 ) {
   const { cookie } = ctx;
 
-  let user: Partial<IUserProjection> = undefined;
-  let error = undefined;
-  validateUser(undefined, email, password, (err, u) => {
-    user = u;
-    error = err;
-  });
-  if (error) {
-    console.error(error);
-    return false;
-  }
+  const user = await validateUser(email, password);
 
   const secret = process.env.ENCRYPTION_TOKEN;
   const cryptr = new Cryptr(secret);

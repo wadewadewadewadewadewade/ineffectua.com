@@ -92,10 +92,28 @@ export type PostInfoFragment = { __typename: 'Post', _id: string, createdAt: str
 
 export type UserInfoFragment = { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any };
 
+export type SignInMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type SignInMutation = { __typename?: 'Mutation', signIn?: { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any } | null | undefined };
+
 export type SignOutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SignOutMutation = { __typename?: 'Mutation', signOut?: boolean | null | undefined };
+
+export type SignUpMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+  username: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+}>;
+
+
+export type SignUpMutation = { __typename?: 'Mutation', signUp?: { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any } | null | undefined };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -347,6 +365,40 @@ export const UserInfoFragmentDoc = gql`
   createdAt
 }
     `;
+export const SignInDocument = gql`
+    mutation signIn($email: String!, $password: String!) {
+  signIn(email: $email, password: $password) {
+    ...UserInfo
+  }
+}
+    ${UserInfoFragmentDoc}`;
+export type SignInMutationFn = Apollo.MutationFunction<SignInMutation, SignInMutationVariables>;
+
+/**
+ * __useSignInMutation__
+ *
+ * To run a mutation, you first call `useSignInMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignInMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signInMutation, { data, loading, error }] = useSignInMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useSignInMutation(baseOptions?: Apollo.MutationHookOptions<SignInMutation, SignInMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignInMutation, SignInMutationVariables>(SignInDocument, options);
+      }
+export type SignInMutationHookResult = ReturnType<typeof useSignInMutation>;
+export type SignInMutationResult = Apollo.MutationResult<SignInMutation>;
+export type SignInMutationOptions = Apollo.BaseMutationOptions<SignInMutation, SignInMutationVariables>;
 export const SignOutDocument = gql`
     mutation signOut {
   signOut
@@ -377,6 +429,42 @@ export function useSignOutMutation(baseOptions?: Apollo.MutationHookOptions<Sign
 export type SignOutMutationHookResult = ReturnType<typeof useSignOutMutation>;
 export type SignOutMutationResult = Apollo.MutationResult<SignOutMutation>;
 export type SignOutMutationOptions = Apollo.BaseMutationOptions<SignOutMutation, SignOutMutationVariables>;
+export const SignUpDocument = gql`
+    mutation signUp($email: String!, $password: String!, $username: String!, $name: String) {
+  signUp(email: $email, password: $password, username: $username, name: $name) {
+    ...UserInfo
+  }
+}
+    ${UserInfoFragmentDoc}`;
+export type SignUpMutationFn = Apollo.MutationFunction<SignUpMutation, SignUpMutationVariables>;
+
+/**
+ * __useSignUpMutation__
+ *
+ * To run a mutation, you first call `useSignUpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignUpMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signUpMutation, { data, loading, error }] = useSignUpMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *      username: // value for 'username'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useSignUpMutation(baseOptions?: Apollo.MutationHookOptions<SignUpMutation, SignUpMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignUpMutation, SignUpMutationVariables>(SignUpDocument, options);
+      }
+export type SignUpMutationHookResult = ReturnType<typeof useSignUpMutation>;
+export type SignUpMutationResult = Apollo.MutationResult<SignUpMutation>;
+export type SignUpMutationOptions = Apollo.BaseMutationOptions<SignUpMutation, SignUpMutationVariables>;
 export const CurrentUserDocument = gql`
     query currentUser {
   currentUser {
@@ -469,10 +557,28 @@ declare module '*/user.ts' {
 }
     
 
+declare module '*/signin.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const signIn: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
 declare module '*/signout.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const signOut: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
+declare module '*/signup.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const signUp: DocumentNode;
 
   export default defaultDocument;
 }
@@ -512,11 +618,25 @@ export const UserInfo = gql`
   createdAt
 }
     `;
+export const SignIn = gql`
+    mutation signIn($email: String!, $password: String!) {
+  signIn(email: $email, password: $password) {
+    ...UserInfo
+  }
+}
+    ${UserInfo}`;
 export const SignOut = gql`
     mutation signOut {
   signOut
 }
     `;
+export const SignUp = gql`
+    mutation signUp($email: String!, $password: String!, $username: String!, $name: String) {
+  signUp(email: $email, password: $password, username: $username, name: $name) {
+    ...UserInfo
+  }
+}
+    ${UserInfo}`;
 export const CurrentUser = gql`
     query currentUser {
   currentUser {

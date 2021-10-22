@@ -5,10 +5,12 @@ import { GraphQLScalarType, Kind } from 'graphql';
 const dateScalar = new GraphQLScalarType({
   name: 'Date',
   description: 'Date custom scalar type',
-  serialize(value) {
-    return value.getTime(); // Convert outgoing Date to integer for JSON
+  serialize(value: Date | null) {
+    if (value) return value.getTime(); // Convert outgoing Date to integer for JSON
+    return value;
   },
-  parseValue(value) {
+  parseValue(value: number | null) {
+    if (value === null) return value;
     return new Date(value); // Convert incoming integer to Date
   },
   parseLiteral(ast) {

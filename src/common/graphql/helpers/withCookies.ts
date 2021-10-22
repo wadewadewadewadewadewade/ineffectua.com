@@ -1,4 +1,9 @@
-import { NextApiResponse, NextApiRequest, NextApiHandler } from 'next';
+import {
+  NextApiResponse,
+  NextApiRequest,
+  NextApiHandler,
+  GetServerSidePropsContext,
+} from 'next';
 import { serialize } from 'cookie';
 
 export interface ICookieOptions {
@@ -18,8 +23,10 @@ export type TCookieMethod = (
 /**
  * This sets `cookie` on `res` object
  */
-const cookie = (
-  res: NextApiResponse,
+export const cookie = (
+  setHeader:
+    | NextApiResponse['setHeader']
+    | GetServerSidePropsContext['res']['setHeader'],
   name: string,
   value: string,
   options: ICookieOptions = {},
@@ -32,7 +39,7 @@ const cookie = (
     options.maxAge /= 1000;
   }
 
-  res.setHeader('Set-Cookie', serialize(name, String(stringValue), options));
+  setHeader('Set-Cookie', serialize(name, String(stringValue), options));
 };
 
 /**
@@ -47,7 +54,7 @@ const withCookies =
     },
   ) => {
     res.cookie = (name: string, value: string, options: ICookieOptions) =>
-      cookie(res, name, value, options);
+      cookie(res.setHeader, name, value, options);
 
     return handler(req, res);
   };

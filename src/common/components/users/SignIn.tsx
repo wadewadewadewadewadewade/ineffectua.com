@@ -29,7 +29,6 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
     handleSubmit,
     control,
     formState: { errors },
-    watch,
   } = useForm<IFormData>({
     defaultValues: {
       email: '',
@@ -37,14 +36,13 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
       password_confirm: '',
     },
   });
-  const email = watch('email');
-  const password = watch('email');
   const [handleSignin] = useMutation(SIGNIN, {
-    variables: { email, password },
-    onCompleted: data => console.log(data),
+    refetchQueries: ['currentUser'],
   });
-  const onSubmit = async (data: IFormData) => {
-    handleSignin();
+  const onSubmit = async (variables: IFormData) => {
+    handleSignin({
+      variables,
+    });
   };
   return (
     <Box

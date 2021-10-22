@@ -1,16 +1,14 @@
 import { ApolloServer } from 'apollo-server-micro';
-import handerWithUserAndDB, {
-  INextApiResponseWithDBAndUser,
-} from '../../common/utils/passport-local';
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import typeDefs from '../../common/graphql/typedefs';
 import resolvers from '../../common/graphql/resolvers';
 import context from '../../common/graphql/context';
 import withCookies from '../../common/graphql/helpers/withCookies';
+import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
 
-const handler = nextConnect<INextApiResponseWithDBAndUser, NextApiResponse>();
-handler.use(handerWithUserAndDB);
+const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
+handler.use(mongodb);
 
 const apolloServer = new ApolloServer({
   typeDefs,
@@ -24,11 +22,19 @@ export const config = {
   },
 };
 
-handler.use(
-  async (req: INextApiResponseWithDBAndUser, res: NextApiResponse) => {
+let started = false;
+
+const startApolloServer = async (
+  req: INextApiRequestWithDB,
+  res: NextApiResponse,
+) => {
+  if (!started) {
     await apolloServer.start();
-    apolloServer.createHandler({ path: '/api/graphql' })(req, res);
-  },
-);
+    started = true;
+  }
+  apolloServer.createHandler({ path: '/api/graphql' })(req, res);
+};
+
+handler.use(startApolloServer);
 
 export default withCookies(handler);

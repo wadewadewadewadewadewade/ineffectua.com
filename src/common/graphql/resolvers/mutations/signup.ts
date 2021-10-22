@@ -1,23 +1,23 @@
 import {
   createOrGetExistingUser,
   ICreateUserUser,
+  serealizeUser,
 } from '../../../models/users/user';
 import Cryptr from 'cryptr';
-import { Db } from 'mongodb';
 import { TCookieMethod } from '../../helpers/withCookies';
 
-export function signUp(
+export async function signUp(
   _,
   data: ICreateUserUser,
-  ctx: { cookie: TCookieMethod; db: Db },
+  _context: { cookie: TCookieMethod },
 ) {
-  const { cookie, db } = ctx;
+  const { cookie } = _context;
 
-  const user = createOrGetExistingUser(db, data);
+  const user = await createOrGetExistingUser(data);
 
   const secret = process.env.ENCRYPTION_TOKEN;
   const cryptr = new Cryptr(secret);
-  const encrypted = cryptr.encrypt(JSON.stringify(user));
+  const encrypted = cryptr.encrypt(serealizeUser(user));
 
   // the password is correct, set a cookie on the response
   cookie('session', encrypted, {
@@ -30,5 +30,5 @@ export function signUp(
   });
 
   // tell the mutation that login was successful
-  return true;
+  return user;
 }

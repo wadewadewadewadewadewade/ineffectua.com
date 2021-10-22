@@ -7,7 +7,8 @@ import { GET_CURRENT_USER } from '../graphql/queries/currentUser';
 
 export const AuthenticationContext = createContext<
   | (IUserProjection & {
-      signout: () => Promise<void>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      signout: () => Promise<any>;
       sendConfirmationEmail?: () => Promise<void>;
     })
   | false
@@ -17,17 +18,16 @@ AuthenticationContext.displayName = 'Authentication';
 
 export const AuthenticationContextProvider: React.FC = ({ children }) => {
   const { data, loading } = useQuery(GET_CURRENT_USER);
-  const [signout] = useMutation(SIGNOUT, {
-    onCompleted: data => console.log(data),
-  });
-  const user = data && data.currentUser ? data.currentUser : false;
+  const [signout] = useMutation(SIGNOUT);
+  const user =
+    data && data.currentUser ? (data.currentUser as IUserProjection) : false;
   return (
     <AuthenticationContext.Provider
       value={
         loading === true
           ? loading
           : user !== false
-          ? { ...AuthenticationContext, signout }
+          ? { ...user, signout }
           : user
       }
     >

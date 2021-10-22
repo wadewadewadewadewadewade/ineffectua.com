@@ -61,7 +61,25 @@ interface VerifyFunctionWithRequest {
   ): void;
 }
 
-export const validateUser: VerifyFunctionWithRequest = async (
+export const validateUser = async (
+  email: string,
+  password: string,
+): Promise<IUserProjection | false> => {
+  if (!client.isConnected) await client.connect();
+  const user = await client
+    .db(process.env.MONGODB_DB)
+    .collection<IUserProjection & { password: string }>('users')
+    .findOne({ email }, UserProjection);
+  if (!user) {
+    return false;
+  }
+  if (user.password !== SHA256(password).toString()) {
+    return false;
+  }
+  return user;
+};
+
+export const validateUserVerifyFunction: VerifyFunctionWithRequest = async (
   req,
   email,
   password,

@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider, NormalizedCacheObject } from '@apollo/client';
 import { AuthenticationContextProvider } from '../common/context/AuthenticationContext';
 import { ThemeProvider } from '@mui/material';
 import theme from '../theme';
@@ -11,6 +11,10 @@ import '../styles/global.css';
 import { client } from '../common/utils/apollo-client';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  if ('apolloStaticCache' in pageProps) {
+    const serversideCache: NormalizedCacheObject = pageProps.apolloStaticCache;
+    client.cache.restore(serversideCache);
+  }
   return (
     <>
       <Head>

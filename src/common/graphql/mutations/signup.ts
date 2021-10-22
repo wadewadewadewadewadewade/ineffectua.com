@@ -1,3 +1,4 @@
+import { UserFragment } from './../fragments/user';
 import { gql } from '@apollo/client';
 
 export const SIGNUP = gql`
@@ -7,6 +8,14 @@ export const SIGNUP = gql`
     $username: String!
     $name: String
   ) {
-    signUp(email: $email, password: $password, username: $username, name: $name) { ... }
+    signUp(
+      email: $email
+      password: $password
+      username: $username
+      name: $name
+    ) {
+      ...UserInfo
+    }
   }
+  ${UserFragment}
 `;

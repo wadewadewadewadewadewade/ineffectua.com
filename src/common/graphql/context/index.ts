@@ -1,14 +1,14 @@
 import { ContextFunction } from 'apollo-server-micro/node_modules/apollo-server-core';
 import Cryptr from 'cryptr';
 import { NextApiRequest } from 'next';
-import { IUserProjection } from '../../models/users/user';
+import { deserealizeUser } from '../../models/users/user';
 import { ineffectuaDb } from '../../utils/mongodb';
 
 if (!process.env.ENCRYPTION_TOKEN) {
   throw new Error('Please add your Encryption Token to .env.local');
 }
 
-function isAuthenticated(req: NextApiRequest) {
+export function isAuthenticated(req: Pick<NextApiRequest, 'cookies'>) {
   // I use a cookie called 'session'
   const { session } = req?.cookies;
 
@@ -20,7 +20,7 @@ function isAuthenticated(req: NextApiRequest) {
   const secret = process.env.ENCRYPTION_TOKEN;
   const cryptr = new Cryptr(secret);
   const user = cryptr.decrypt(session);
-  return user ? (JSON.parse(user) as IUserProjection) : false;
+  return user ? deserealizeUser(user) : false;
 }
 
 export const context: ContextFunction = ctx => {

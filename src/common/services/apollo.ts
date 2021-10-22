@@ -5,6 +5,7 @@ import {
   ApolloLink,
   HttpLink,
   ServerError,
+  NormalizedCacheObject,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import schema from '../graphql/schema';
@@ -60,20 +61,28 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const link = ApolloLink.from([errorLink, createIsomorphLink()]);
 
-export function createApolloClient(initialState = {}) {
+export function createApolloClient(initialState: NormalizedCacheObject = {}) {
   const ssrMode = typeof window === 'undefined';
-  const cache = new InMemoryCache(/*{
+  const cache = new InMemoryCache({
     typePolicies: {
-      Bookmark: {
-        keyFields: ['url'],
+      Post: {
+        keyFields: ['_id'],
         fields: {
-          url: {
+          _id: {
+            merge: false,
+          },
+        },
+      },
+      User: {
+        keyFields: ['_id'],
+        fields: {
+          _id: {
             merge: false,
           },
         },
       },
     },
-  }*/).restore(initialState);
+  }).restore(initialState);
 
   return new ApolloClient({
     ssrMode,
@@ -82,7 +91,9 @@ export function createApolloClient(initialState = {}) {
   });
 }
 
-export function initApolloClient(initialState = {}) {
+export function initApolloClient(
+  initialState = {},
+): ApolloClient<NormalizedCacheObject> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   // ref https://github.com/zeit/next.js/blob/canary/examples/api-routes-apollo-server-and-client/apollo/client.js
