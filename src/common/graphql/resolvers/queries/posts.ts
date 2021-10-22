@@ -11,7 +11,6 @@ export const getPosts = async (
     userId?: string;
   },
   _context: { db: Db },
-  _info,
 ): Promise<Omit<IPost, 'deletedAt'>[]> => {
   console.log('posts', _context);
   const databasePosts = await _context.db

@@ -3,8 +3,8 @@ import {
   ICreateUserUser,
 } from '../../../models/users/user';
 import Cryptr from 'cryptr';
-import { TCookieMethod } from '../../../utils/cookies';
 import { Db } from 'mongodb';
+import { TCookieMethod } from '../../helpers/withCookies';
 
 export function signUp(
   _,

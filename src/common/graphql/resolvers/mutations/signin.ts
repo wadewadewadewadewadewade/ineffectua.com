@@ -1,7 +1,7 @@
 import { IUserProjection } from '../../../models/users/user';
 import Cryptr from 'cryptr';
-import { TCookieMethod } from '../../../utils/cookies';
 import { validateUser } from '../../../utils/mongodb';
+import { TCookieMethod } from '../../helpers/withCookies';
 
 export function signIn(
   _,

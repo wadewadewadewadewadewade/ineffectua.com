@@ -24,6 +24,11 @@ export const config = {
   },
 };
 
-handler.use(apolloServer.createHandler({ path: '/api/graphql' }));
+handler.use(
+  async (req: INextApiResponseWithDBAndUser, res: NextApiResponse) => {
+    await apolloServer.start();
+    apolloServer.createHandler({ path: '/api/graphql' })(req, res);
+  },
+);
 
 export default withCookies(handler);

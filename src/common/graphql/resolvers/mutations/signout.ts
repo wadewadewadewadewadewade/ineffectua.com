@@ -1,4 +1,4 @@
-import { TCookieMethod } from '../../../utils/cookies';
+import { TCookieMethod } from '../../helpers/withCookies';
 
 export function signOut(_, _args, ctx: { cookie: TCookieMethod }) {
   const { cookie } = ctx;
