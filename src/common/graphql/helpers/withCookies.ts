@@ -24,9 +24,7 @@ export type TCookieMethod = (
  * This sets `cookie` on `res` object
  */
 export const cookie = (
-  setHeader:
-    | NextApiResponse['setHeader']
-    | GetServerSidePropsContext['res']['setHeader'],
+  res: NextApiResponse | GetServerSidePropsContext['res'],
   name: string,
   value: string,
   options: ICookieOptions = {},
@@ -39,7 +37,7 @@ export const cookie = (
     options.maxAge /= 1000;
   }
 
-  setHeader('Set-Cookie', serialize(name, String(stringValue), options));
+  res.setHeader('Set-Cookie', serialize(name, String(stringValue), options));
 };
 
 /**
@@ -54,7 +52,7 @@ const withCookies =
     },
   ) => {
     res.cookie = (name: string, value: string, options: ICookieOptions) =>
-      cookie(res.setHeader, name, value, options);
+      cookie(res, name, value, options);
 
     return handler(req, res);
   };

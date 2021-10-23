@@ -1,10 +1,80 @@
 import {
-  createOrGetExistingUser,
-  ICreateUserUser,
+  IUser,
   serealizeUser,
+  UserProjection,
+  IUserProjection,
 } from '../../../models/users/user';
 import Cryptr from 'cryptr';
 import { TCookieMethod } from '../../helpers/withCookies';
+import { SHA256 } from 'crypto-js';
+import { ineffectuaDb } from '../../../utils/mongodb';
+
+export interface ICreateUserUser {
+  email: IUser['email'];
+  password: string;
+  username: IUser['username'];
+  name?: IUser['name'];
+}
+
+export const createOrGetExistingUser = async (
+  user: ICreateUserUser,
+): Promise<IUserProjection> => {
+  const passwordEncoded = SHA256(user.password).toString();
+  const db = await ineffectuaDb();
+  const existingUser: IUserProjection | false = await db
+    .collection<IUserProjection>('users')
+    .findOne(
+      {
+        email: user.email,
+        password: passwordEncoded,
+      },
+      UserProjection,
+    );
+  if (existingUser) {
+    return existingUser;
+  }
+  const createdAt = new Date(Date.now());
+  const result = await db
+    .collection<Partial<Omit<IUser, '_id'>>>('users')
+    .insertOne({
+      email: user.email,
+      password: passwordEncoded,
+      username: user.username,
+      name: user.name,
+      createdAt,
+      lastActiveAt: createdAt,
+    });
+  return {
+    image: undefined,
+    isConfirmed: false,
+    locked: false,
+    email: user.email,
+    username: user.username,
+    name: user.name,
+    _id: result.insertedId.toString(),
+    lastActiveAt: createdAt,
+  };
+};
+
+export const getExistingUser = async (
+  user: ICreateUserUser,
+): Promise<IUserProjection | false> => {
+  const db = await ineffectuaDb();
+  const passwordEncoded = SHA256(user.password).toString();
+  const existingUser: IUserProjection | false = await db
+    .collection<IUserProjection>('users')
+    .findOne(
+      {
+        email: user.email,
+        password: passwordEncoded,
+      },
+      UserProjection,
+    );
+  if (existingUser) {
+    return existingUser;
+  }
+  return false;
+};
 
 export async function signUp(
   _,

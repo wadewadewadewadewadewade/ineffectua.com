@@ -45,9 +45,9 @@ export const SiteAppBar: React.FC = () => {
     return null;
   }
   const isAuthenticated = typeof authentication !== 'boolean';
-  const signout =
-    typeof authentication !== 'boolean' && 'signout' in authentication
-      ? authentication.signout
+  const signOut =
+    typeof authentication !== 'boolean' && 'signOut' in authentication
+      ? authentication.signOut
       : undefined;
   return (
     <AppBar>
@@ -84,7 +84,7 @@ export const SiteAppBar: React.FC = () => {
             menuItems={[
               {
                 name: 'signout',
-                onClose: signout,
+                onClose: signOut,
                 children: (
                   <>
                     <Logout sx={{ marginRight: 1 }} />

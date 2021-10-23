@@ -25,9 +25,15 @@ export type AdditionalEntityFields = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  sendConfirmationEmail?: Maybe<Scalars['Boolean']>;
   signIn?: Maybe<User>;
   signOut?: Maybe<Scalars['Boolean']>;
   signUp?: Maybe<User>;
+};
+
+
+export type MutationSendConfirmationEmailArgs = {
+  _id: Scalars['String'];
 };
 
 
@@ -91,6 +97,13 @@ export type User = {
 export type PostInfoFragment = { __typename: 'Post', _id: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } };
 
 export type UserInfoFragment = { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any };
+
+export type SendConfirmationEmailMutationVariables = Exact<{
+  _id: Scalars['String'];
+}>;
+
+
+export type SendConfirmationEmailMutation = { __typename?: 'Mutation', sendConfirmationEmail?: boolean | null | undefined };
 
 export type SignInMutationVariables = Exact<{
   email: Scalars['String'];
@@ -278,6 +291,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  sendConfirmationEmail?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSendConfirmationEmailArgs, '_id'>>;
   signIn?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   signUp?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'password' | 'username'>>;
@@ -365,6 +379,37 @@ export const UserInfoFragmentDoc = gql`
   createdAt
 }
     `;
+export const SendConfirmationEmailDocument = gql`
+    mutation sendConfirmationEmail($_id: String!) {
+  sendConfirmationEmail(_id: $_id)
+}
+    `;
+export type SendConfirmationEmailMutationFn = Apollo.MutationFunction<SendConfirmationEmailMutation, SendConfirmationEmailMutationVariables>;
+
+/**
+ * __useSendConfirmationEmailMutation__
+ *
+ * To run a mutation, you first call `useSendConfirmationEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendConfirmationEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendConfirmationEmailMutation, { data, loading, error }] = useSendConfirmationEmailMutation({
+ *   variables: {
+ *      _id: // value for '_id'
+ *   },
+ * });
+ */
+export function useSendConfirmationEmailMutation(baseOptions?: Apollo.MutationHookOptions<SendConfirmationEmailMutation, SendConfirmationEmailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendConfirmationEmailMutation, SendConfirmationEmailMutationVariables>(SendConfirmationEmailDocument, options);
+      }
+export type SendConfirmationEmailMutationHookResult = ReturnType<typeof useSendConfirmationEmailMutation>;
+export type SendConfirmationEmailMutationResult = Apollo.MutationResult<SendConfirmationEmailMutation>;
+export type SendConfirmationEmailMutationOptions = Apollo.BaseMutationOptions<SendConfirmationEmailMutation, SendConfirmationEmailMutationVariables>;
 export const SignInDocument = gql`
     mutation signIn($email: String!, $password: String!) {
   signIn(email: $email, password: $password) {
@@ -557,6 +602,15 @@ declare module '*/user.ts' {
 }
     
 
+declare module '*/sendconfirmationemail.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const sendConfirmationEmail: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
 declare module '*/signin.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
@@ -616,6 +670,11 @@ export const UserInfo = gql`
   confirmedAt
   updatedAt
   createdAt
+}
+    `;
+export const SendConfirmationEmail = gql`
+    mutation sendConfirmationEmail($_id: String!) {
+  sendConfirmationEmail(_id: $_id)
 }
     `;
 export const SignIn = gql`

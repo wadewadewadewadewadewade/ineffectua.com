@@ -18,9 +18,8 @@ export const ConfirmEmail: React.FC = () => {
       <Typography>Please check your email</Typography>
       {!isSent && (
         <Button
-          onClick={() => {
-            sendConfirmationEmail();
-            setIsSent(true);
+          onClick={async () => {
+            sendConfirmationEmail && (await sendConfirmationEmail(setIsSent));
           }}
         >
           Resend confirmation email

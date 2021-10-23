@@ -13,7 +13,7 @@ import { Box } from '@mui/system';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { SIGNUP } from '../../graphql/mutations/signup';
-import { ICreateUserUser } from '../../models/users/user';
+import { ICreateUserUser } from '../../graphql/resolvers/mutations/signup';
 
 interface IFormData extends ICreateUserUser {
   password_confirm: string;

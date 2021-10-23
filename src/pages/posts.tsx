@@ -5,9 +5,9 @@ import { IPostWithReplies } from '../common/types/IPost';
 import { GetServerSideProps } from 'next';
 import { RequireAuthentication } from '../common/components/users/RequireAuthentication';
 import {
-  deserealizeUser,
   IUserProjection,
   serealizeUser,
+  deserealizeUser,
 } from '../common/models/users/user';
 import { GET_POSTS } from '../common/graphql/queries/posts';
 import { initApolloClient } from '../common/services/apollo';
@@ -17,17 +17,16 @@ import { ineffectuaDb } from '../common/utils/mongodb';
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const c = (name: string, value: string, options: ICookieOptions) =>
-    cookie(ctx.res.setHeader, name, value, options);
+    cookie(ctx.res, name, value, options);
   const user = isAuthenticated(ctx.req);
   const context = { db: ineffectuaDb, cookie: c, user };
-  const client = initApolloClient({});
+  const client = initApolloClient();
   const {
     data: { posts },
   } = await client.query({
     query: GET_POSTS,
     context,
   });
-  console.log({ posts, user });
   return {
     props: {
       posts: posts || [],
@@ -49,7 +48,6 @@ export function Home({
 }) {
   const router = useRouter();
   const user: IUserProjection | false = deserealizeUser(serialzedUser);
-  console.log({ user });
   return (
     <>
       <RequireAuthentication user={user}>

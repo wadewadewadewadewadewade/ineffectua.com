@@ -1,8 +1,5 @@
-import { FindOptions, ObjectId } from 'mongodb';
-import { IPostWithReplies } from '../../types/IPost';
-import { IPost } from '../posts/post';
-import { SHA256 } from 'crypto-js';
-import { ineffectuaDb } from '../../utils/mongodb';
+import { FindOptions } from 'mongodb';
+import { isNumeric } from '../../utils/general-helpers';
 
 export interface IUser {
   _id: string;
@@ -61,11 +58,6 @@ export const serealizeUser = (user: IUserProjection | false): string => {
   return JSON.stringify(userObject);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isNumeric(n: any) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
 export const deserealizeUser = (userString: string): IUserProjection => {
   const userObject = JSON.parse(userString);
   const keys = Object.keys(userObject);
@@ -93,110 +85,3 @@ export const deserealizeUser = (userString: string): IUserProjection => {
 };
 
 export const UserProjection = UserProjectionRecord as FindOptions<IUser>;
-
-export const getUser = async (
-  _id?: IUser['_id'],
-): Promise<IUserProjection | false> => {
-  if (_id) {
-    const db = await ineffectuaDb();
-    const user = await db
-      .collection<IUser>('users')
-      .findOne({ _id: new ObjectId(_id) }, UserProjection);
-    return user;
-  }
-  return false;
-};
-
-export interface ICreateUserUser {
-  email: IUser['email'];
-  password: string;
-  username: IUser['username'];
-  name?: IUser['name'];
-}
-
-export const createOrGetExistingUser = async (
-  user: ICreateUserUser,
-): Promise<IUserProjection> => {
-  const passwordEncoded = SHA256(user.password).toString();
-  const db = await ineffectuaDb();
-  const existingUser: IUserProjection | false = await db
-    .collection<IUserProjection>('users')
-    .findOne(
-      {
-        email: user.email,
-        password: passwordEncoded,
-      },
-      UserProjection,
-    );
-  if (existingUser) {
-    return existingUser;
-  }
-  const createdAt = new Date(Date.now());
-  const result = await db
-    .collection<Partial<Omit<IUser, '_id'>>>('users')
-    .insertOne({
-      email: user.email,
-      password: passwordEncoded,
-      username: user.username,
-      name: user.name,
-      createdAt,
-      lastActiveAt: createdAt,
-    });
-  return {
-    image: undefined,
-    isConfirmed: false,
-    locked: false,
-    email: user.email,
-    username: user.username,
-    name: user.name,
-    _id: result.insertedId.toString(),
-    lastActiveAt: createdAt,
-  };
-};
-
-export const getExistingUser = async (
-  user: ICreateUserUser,
-): Promise<IUserProjection | false> => {
-  const db = await ineffectuaDb();
-  const passwordEncoded = SHA256(user.password).toString();
-  const existingUser: IUserProjection | false = await db
-    .collection<IUserProjection>('users')
-    .findOne(
-      {
-        email: user.email,
-        password: passwordEncoded,
-      },
-      UserProjection,
-    );
-  if (existingUser) {
-    return existingUser;
-  }
-  return false;
-};
-
-export const getUsersForPosts = async (
-  databasePosts: IPost[],
-  posts: IPostWithReplies[],
-): Promise<void[]> =>
-  Promise.all(
-    databasePosts.map(
-      dbPost =>
-        new Promise<void>((response, reject) => {
-          try {
-            getUser(dbPost.author._id).then(r => {
-              if (r === false) {
-                reject(r);
-              } else {
-                posts.push({
-                  ...dbPost,
-                  author: { _id: r._id, username: r.username, image: r.image },
-                });
-                response();
-              }
-            });
-          } catch (ex) {
-            reject(ex);
-          }
-        }),
-    ),
-  );

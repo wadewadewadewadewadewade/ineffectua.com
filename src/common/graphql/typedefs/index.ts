@@ -45,6 +45,7 @@ const typeDefs: Config['typeDefs'] = gql`
       name: String
     ): User
     signOut: Boolean
+    sendConfirmationEmail(_id: String!): Boolean
   }
 `;
 
