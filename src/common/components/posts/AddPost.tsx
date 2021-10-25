@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import RichText from '../RichText/RichText';
-import fetchJson, { EApiEndpoints } from '../../utils/fetcher';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PostMasonry from './PostMasonry';
 import {
@@ -18,6 +17,10 @@ import {
 import { IPostWithReplies } from '../../types/IPost';
 import ExpandMore from '../ExpandMore';
 import AuthenticationContext from '../../context/AuthenticationContext';
+import { useMutation, useQuery } from '@apollo/client';
+import { ADD_POST } from '../../graphql/mutations/addPost';
+import { IPost } from '../../models/posts/post';
+import { GET_POSTS } from '../../graphql/queries/posts';
 
 interface IFormData {
   body: string;
@@ -42,13 +45,22 @@ export const AddPost: React.FC<IAddPost> = props => {
   const userContext = useContext(AuthenticationContext);
   const isUserLoading = userContext === true;
   const [body, setBody] = useState<string>();
-  const [replies, setReplies] = useState<IPostWithReplies[]>(
-    passedReplies || [],
-  );
   const [showReplies, setShowReplies] = useState(
     passedReplies && passedReplies.length > 0,
   );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [addPost, { loading: addPostLoading }] = useMutation<IPost | string>(
+    ADD_POST,
+    { refetchQueries: [{ query: GET_POSTS, variables: { inReplyTo } }] },
+  );
+  const { data: replies, loading: repliesLoading } = useQuery<
+    IPost[] | undefined
+  >(GET_POSTS, {
+    variables: {
+      inReplyTo,
+    },
+    skip: !!passedReplies || !inReplyTo,
+  });
+  const loading = addPostLoading || repliesLoading;
   const imagesRef = useRef<string[]>([]);
   const handleSubmit: (
     method: (data: IFormData) => void,
@@ -59,24 +71,12 @@ export const AddPost: React.FC<IAddPost> = props => {
       method({ body });
     };
   };
-  /*useEffect(() => {
-    const getReplies = async () => {
-      const rep = await fetchJson(
-        'GET',
-        EApiEndpoints.POSTS,
-        inReplyTo ? `?inReplyTo=${inReplyTo}` : undefined,
-      );
-      setReplies(rep);
-    };
-    !passedReplies && getReplies();
-  }, [inReplyTo, passedReplies]);*/
   const onSubmit = async (data: IFormData) => {
     // ignore submissions with no body
     if (!data.body || data.body.length < 1) {
       return;
     }
     onWillPost && onWillPost();
-    setIsLoading(true);
     // remove unused images
     if (Array.isArray(imagesRef.current)) {
       const imagesToRemove = [];
@@ -97,21 +97,16 @@ export const AddPost: React.FC<IAddPost> = props => {
       }
     }
     // then post
-    const newPost: IPostWithReplies = await fetchJson(
-      'POST',
-      EApiEndpoints.POSTS,
-      undefined,
-      JSON.stringify({ ...data, ...(inReplyTo ? { inReplyTo } : {}) }),
-      {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+    addPost({
+      variables: { ...data, ...(inReplyTo ? { inReplyTo } : {}) },
+      onCompleted: result => {
+        if (typeof result !== 'string' && props.replies) {
+          // if replies are passed in, update that list here because onPost won't update that
+          onPost && onPost(result);
+          setShowReplies(true);
+        }
       },
-    );
-    setIsLoading(false);
-    setShowReplies(true);
-    // if replies are passed in, update that list here because onPost won't update that
-    props.replies && setReplies(prevState => [...prevState, newPost]);
-    onPost && onPost(newPost);
+    });
   };
   if (isUserLoading) {
     return null;
@@ -120,9 +115,9 @@ export const AddPost: React.FC<IAddPost> = props => {
     <Card sx={{ overflow: 'visible', width: '100%' }}>
       <CardContent sx={{ position: 'relative' }}>
         <Fade
-          in={isLoading}
+          in={loading}
           style={{
-            transitionDelay: isLoading ? '800ms' : '0ms',
+            transitionDelay: loading ? '800ms' : '0ms',
           }}
           unmountOnExit
         >
@@ -149,7 +144,7 @@ export const AddPost: React.FC<IAddPost> = props => {
           </Typography>
           <RichText
             onChange={html => setBody(html)}
-            clearField={isLoading}
+            clearField={loading}
             onImageUploaded={imageUrl =>
               Array.isArray(imagesRef.current)
                 ? imagesRef.current.push(imageUrl)
@@ -164,7 +159,7 @@ export const AddPost: React.FC<IAddPost> = props => {
           disableGutters
         >
           <Button
-            disabled={isLoading}
+            disabled={loading}
             variant='contained'
             onClick={e => {
               e.preventDefault();
@@ -193,19 +188,7 @@ export const AddPost: React.FC<IAddPost> = props => {
           timeout='auto'
           sx={{ paddingLeft: 1, paddingRight: 1 }}
         >
-          {showReplies && (
-            <PostMasonry
-              posts={replies || []}
-              onDelete={
-                props.replies
-                  ? _id =>
-                      setReplies(prevState =>
-                        prevState.filter(post => post._id !== _id),
-                      )
-                  : undefined
-              }
-            />
-          )}
+          {showReplies && <PostMasonry posts={replies || []} />}
         </Collapse>
       )}
     </Card>

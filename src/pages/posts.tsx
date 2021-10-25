@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/dist/client/router';
 import AddPost from '../common/components/posts/AddPost';
-import { IPostWithReplies } from '../common/types/IPost';
 import { GetServerSideProps } from 'next';
 import { RequireAuthentication } from '../common/components/users/RequireAuthentication';
 import {
@@ -15,6 +14,7 @@ import { cookie, ICookieOptions } from '../common/graphql/helpers/withCookies';
 import { isAuthenticated } from '../common/graphql/context';
 import { ineffectuaDb } from '../common/utils/mongodb';
 import PostMasonry from '../common/components/posts/PostMasonry';
+import { IPost } from '../common/models/posts/post';
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const c = (name: string, value: string, options: ICookieOptions) =>
@@ -23,8 +23,8 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   const context = { db: ineffectuaDb, cookie: c, user };
   const client = initApolloClient();
   const {
-    data: { posts },
-  } = await client.query({
+    data: { getPosts: posts },
+  } = await client.query<{ getPosts: IPost[] }>({
     query: GET_POSTS,
     context,
   });
@@ -44,7 +44,7 @@ export function Home({
   posts,
   serialzedUser,
 }: {
-  posts: IPostWithReplies[];
+  posts: IPost[];
   serialzedUser: string;
 }) {
   const router = useRouter();

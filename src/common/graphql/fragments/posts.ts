@@ -7,6 +7,7 @@ export const PostFragment = gql`
     author {
       _id
     }
+    body
     createdAt
   }
 `;

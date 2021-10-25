@@ -4,7 +4,7 @@ const typeDefs: Config['typeDefs'] = gql`
   scalar Date
 
   type User {
-    _id: ID!
+    _id: String!
     email: String!
     password: String!
     username: String!
@@ -19,13 +19,13 @@ const typeDefs: Config['typeDefs'] = gql`
   }
 
   type PostAuthor {
-    _id: ID!
+    _id: String!
   }
 
   type Post {
-    _id: ID!
+    _id: String!
     author: PostAuthor!
-    inReplyTo: ID
+    inReplyTo: String
     createdAt: String!
     deletedAt: String
     body: String!
@@ -46,6 +46,7 @@ const typeDefs: Config['typeDefs'] = gql`
     ): User
     signOut: Boolean
     sendConfirmationEmail(_id: String!): Boolean
+    addPost(body: String!, inReplyTo: String): Post
   }
 `;
 

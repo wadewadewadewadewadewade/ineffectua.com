@@ -25,10 +25,17 @@ export type AdditionalEntityFields = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addPost?: Maybe<Post>;
   sendConfirmationEmail?: Maybe<Scalars['Boolean']>;
   signIn?: Maybe<User>;
   signOut?: Maybe<Scalars['Boolean']>;
   signUp?: Maybe<User>;
+};
+
+
+export type MutationAddPostArgs = {
+  body: Scalars['String'];
+  inReplyTo?: Maybe<Scalars['String']>;
 };
 
 
@@ -52,17 +59,17 @@ export type MutationSignUpArgs = {
 
 export type Post = {
   __typename?: 'Post';
-  _id: Scalars['ID'];
+  _id: Scalars['String'];
   author: PostAuthor;
   body: Scalars['String'];
   createdAt: Scalars['String'];
   deletedAt?: Maybe<Scalars['String']>;
-  inReplyTo?: Maybe<Scalars['ID']>;
+  inReplyTo?: Maybe<Scalars['String']>;
 };
 
 export type PostAuthor = {
   __typename?: 'PostAuthor';
-  _id: Scalars['ID'];
+  _id: Scalars['String'];
 };
 
 export type Query = {
@@ -80,7 +87,7 @@ export type QueryGetPostsArgs = {
 
 export type User = {
   __typename?: 'User';
-  _id: Scalars['ID'];
+  _id: Scalars['String'];
   confirmedAt?: Maybe<Scalars['Date']>;
   createdAt: Scalars['Date'];
   email: Scalars['String'];
@@ -94,9 +101,17 @@ export type User = {
   username: Scalars['String'];
 };
 
-export type PostInfoFragment = { __typename: 'Post', _id: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } };
+export type PostInfoFragment = { __typename: 'Post', _id: string, body: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } };
 
 export type UserInfoFragment = { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any };
+
+export type AddPostMutationVariables = Exact<{
+  body: Scalars['String'];
+  inReplyTo?: Maybe<Scalars['String']>;
+}>;
+
+
+export type AddPostMutation = { __typename?: 'Mutation', addPost?: { __typename: 'Post', _id: string, body: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } } | null | undefined };
 
 export type SendConfirmationEmailMutationVariables = Exact<{
   _id: Scalars['String'];
@@ -140,7 +155,7 @@ export type GetPostsQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename: 'Post', _id: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } } | null | undefined> };
+export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename: 'Post', _id: string, body: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } } | null | undefined> };
 
 
 
@@ -217,7 +232,6 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Post: ResolverTypeWrapper<Post>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   PostAuthor: ResolverTypeWrapper<PostAuthor>;
   Query: ResolverTypeWrapper<{}>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -232,7 +246,6 @@ export type ResolversParentTypes = {
   Mutation: {};
   Boolean: Scalars['Boolean'];
   Post: Post;
-  ID: Scalars['ID'];
   PostAuthor: PostAuthor;
   Query: {};
   Int: Scalars['Int'];
@@ -291,6 +304,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<MutationAddPostArgs, 'body'>>;
   sendConfirmationEmail?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSendConfirmationEmailArgs, '_id'>>;
   signIn?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
@@ -298,17 +312,17 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
-  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   author?: Resolver<ResolversTypes['PostAuthor'], ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   deletedAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  inReplyTo?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  inReplyTo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type PostAuthorResolvers<ContextType = any, ParentType extends ResolversParentTypes['PostAuthor'] = ResolversParentTypes['PostAuthor']> = {
-  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -318,7 +332,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   confirmedAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -360,6 +374,7 @@ export const PostInfoFragmentDoc = gql`
   author {
     _id
   }
+  body
   createdAt
 }
     `;
@@ -379,6 +394,40 @@ export const UserInfoFragmentDoc = gql`
   createdAt
 }
     `;
+export const AddPostDocument = gql`
+    mutation addPost($body: String!, $inReplyTo: String) {
+  addPost(body: $body, inReplyTo: $inReplyTo) {
+    ...PostInfo
+  }
+}
+    ${PostInfoFragmentDoc}`;
+export type AddPostMutationFn = Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>;
+
+/**
+ * __useAddPostMutation__
+ *
+ * To run a mutation, you first call `useAddPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPostMutation, { data, loading, error }] = useAddPostMutation({
+ *   variables: {
+ *      body: // value for 'body'
+ *      inReplyTo: // value for 'inReplyTo'
+ *   },
+ * });
+ */
+export function useAddPostMutation(baseOptions?: Apollo.MutationHookOptions<AddPostMutation, AddPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddPostMutation, AddPostMutationVariables>(AddPostDocument, options);
+      }
+export type AddPostMutationHookResult = ReturnType<typeof useAddPostMutation>;
+export type AddPostMutationResult = Apollo.MutationResult<AddPostMutation>;
+export type AddPostMutationOptions = Apollo.BaseMutationOptions<AddPostMutation, AddPostMutationVariables>;
 export const SendConfirmationEmailDocument = gql`
     mutation sendConfirmationEmail($_id: String!) {
   sendConfirmationEmail(_id: $_id)
@@ -602,6 +651,15 @@ declare module '*/user.ts' {
 }
     
 
+declare module '*/addPost.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const addPost: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
 declare module '*/sendconfirmationemail.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
@@ -653,6 +711,7 @@ export const PostInfo = gql`
   author {
     _id
   }
+  body
   createdAt
 }
     `;
@@ -672,6 +731,13 @@ export const UserInfo = gql`
   createdAt
 }
     `;
+export const AddPost = gql`
+    mutation addPost($body: String!, $inReplyTo: String) {
+  addPost(body: $body, inReplyTo: $inReplyTo) {
+    ...PostInfo
+  }
+}
+    ${PostInfo}`;
 export const SendConfirmationEmail = gql`
     mutation sendConfirmationEmail($_id: String!) {
   sendConfirmationEmail(_id: $_id)
