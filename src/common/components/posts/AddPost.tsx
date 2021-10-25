@@ -21,6 +21,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { ADD_POST } from '../../graphql/mutations/addPost';
 import { IPost } from '../../models/posts/post';
 import { GET_POSTS } from '../../graphql/queries/posts';
+import { DELETE_FILES } from '../../graphql/mutations/deleteFiles';
 
 interface IFormData {
   body: string;
@@ -59,10 +60,7 @@ export const AddPost: React.FC<IAddPost> = props => {
       }
     },
   });
-  console.log(
-    { passedReplies, inReplyTo, replies },
-    !!passedReplies || !inReplyTo,
-  );
+  const [deleteFiles] = useMutation(DELETE_FILES);
   const { loading: repliesLoading } = useQuery<{
     getPosts: IPost[] | undefined;
   }>(GET_POSTS, {
@@ -91,21 +89,16 @@ export const AddPost: React.FC<IAddPost> = props => {
     onWillPost && onWillPost();
     // remove unused images
     if (Array.isArray(imagesRef.current)) {
-      const imagesToRemove = [];
+      const imagesToRemove: string[] = [];
       imagesRef.current.forEach(imageUrl => {
         if (!data.body.includes(imageUrl)) {
           imagesToRemove.push(imageUrl);
         }
       });
       if (imagesToRemove.length > 0) {
-        await fetch('/api/images', {
-          method: 'DELETE',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(imagesToRemove),
-        });
+        deleteFiles({ variables: { urls: imagesToRemove } }).catch(err =>
+          console.error(err),
+        );
       }
     }
     // then post

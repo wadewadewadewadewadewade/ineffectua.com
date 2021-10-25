@@ -16,6 +16,8 @@ export type Scalars = {
   Int: number;
   Float: number;
   Date: any;
+  SimpleResponse: any;
+  Upload: any;
 };
 
 export type AdditionalEntityFields = {
@@ -23,19 +25,39 @@ export type AdditionalEntityFields = {
   type?: Maybe<Scalars['String']>;
 };
 
+export type File = {
+  __typename?: 'File';
+  encoding: Scalars['String'];
+  filename: Scalars['String'];
+  mimetype: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addPost?: Maybe<Post>;
+  deleteFiles?: Maybe<Scalars['Boolean']>;
+  deletePost?: Maybe<Scalars['SimpleResponse']>;
   sendConfirmationEmail?: Maybe<Scalars['Boolean']>;
   signIn?: Maybe<User>;
   signOut?: Maybe<Scalars['Boolean']>;
   signUp?: Maybe<User>;
+  singleUpload: Scalars['String'];
 };
 
 
 export type MutationAddPostArgs = {
   body: Scalars['String'];
   inReplyTo?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeleteFilesArgs = {
+  urls: Array<Maybe<Scalars['String']>>;
+};
+
+
+export type MutationDeletePostArgs = {
+  _id: Scalars['String'];
 };
 
 
@@ -57,6 +79,11 @@ export type MutationSignUpArgs = {
   username: Scalars['String'];
 };
 
+
+export type MutationSingleUploadArgs = {
+  file: Scalars['Upload'];
+};
+
 export type Post = {
   __typename?: 'Post';
   _id: Scalars['String'];
@@ -76,6 +103,7 @@ export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
   getPosts: Array<Maybe<Post>>;
+  otherFields: Scalars['Boolean'];
 };
 
 
@@ -113,6 +141,20 @@ export type AddPostMutationVariables = Exact<{
 
 export type AddPostMutation = { __typename?: 'Mutation', addPost?: { __typename: 'Post', _id: string, body: string, createdAt: string, author: { __typename?: 'PostAuthor', _id: string } } | null | undefined };
 
+export type DeleteFilesMutationVariables = Exact<{
+  urls: Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>;
+}>;
+
+
+export type DeleteFilesMutation = { __typename?: 'Mutation', deleteFiles?: boolean | null | undefined };
+
+export type DeletePostMutationVariables = Exact<{
+  _id: Scalars['String'];
+}>;
+
+
+export type DeletePostMutation = { __typename?: 'Mutation', deletePost?: any | null | undefined };
+
 export type SendConfirmationEmailMutationVariables = Exact<{
   _id: Scalars['String'];
 }>;
@@ -142,6 +184,13 @@ export type SignUpMutationVariables = Exact<{
 
 
 export type SignUpMutation = { __typename?: 'Mutation', signUp?: { __typename: 'User', _id: string, email: string, username: string, name?: string | null | undefined, image?: string | null | undefined, locked?: boolean | null | undefined, isConfirmed?: boolean | null | undefined, lastActiveAt: any, confirmedAt?: any | null | undefined, updatedAt?: any | null | undefined, createdAt: any } | null | undefined };
+
+export type SingleUploadMutationVariables = Exact<{
+  file: Scalars['Upload'];
+}>;
+
+
+export type SingleUploadMutation = { __typename?: 'Mutation', singleUpload: string };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -229,12 +278,15 @@ export type ResolversTypes = {
   AdditionalEntityFields: AdditionalEntityFields;
   String: ResolverTypeWrapper<Scalars['String']>;
   Date: ResolverTypeWrapper<Scalars['Date']>;
+  File: ResolverTypeWrapper<File>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Post: ResolverTypeWrapper<Post>;
   PostAuthor: ResolverTypeWrapper<PostAuthor>;
   Query: ResolverTypeWrapper<{}>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  SimpleResponse: ResolverTypeWrapper<Scalars['SimpleResponse']>;
+  Upload: ResolverTypeWrapper<Scalars['Upload']>;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -243,12 +295,15 @@ export type ResolversParentTypes = {
   AdditionalEntityFields: AdditionalEntityFields;
   String: Scalars['String'];
   Date: Scalars['Date'];
+  File: File;
   Mutation: {};
   Boolean: Scalars['Boolean'];
   Post: Post;
   PostAuthor: PostAuthor;
   Query: {};
   Int: Scalars['Int'];
+  SimpleResponse: Scalars['SimpleResponse'];
+  Upload: Scalars['Upload'];
   User: User;
 };
 
@@ -303,12 +358,22 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Date';
 }
 
+export type FileResolvers<ContextType = any, ParentType extends ResolversParentTypes['File'] = ResolversParentTypes['File']> = {
+  encoding?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  filename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  mimetype?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<MutationAddPostArgs, 'body'>>;
+  deleteFiles?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteFilesArgs, 'urls'>>;
+  deletePost?: Resolver<Maybe<ResolversTypes['SimpleResponse']>, ParentType, ContextType, RequireFields<MutationDeletePostArgs, '_id'>>;
   sendConfirmationEmail?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSendConfirmationEmailArgs, '_id'>>;
   signIn?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   signUp?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'password' | 'username'>>;
+  singleUpload?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSingleUploadArgs, 'file'>>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
@@ -329,7 +394,16 @@ export type PostAuthorResolvers<ContextType = any, ParentType extends ResolversP
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   getPosts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType, RequireFields<QueryGetPostsArgs, never>>;
+  otherFields?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
+
+export interface SimpleResponseScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['SimpleResponse'], any> {
+  name: 'SimpleResponse';
+}
+
+export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
+  name: 'Upload';
+}
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -349,10 +423,13 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   Date?: GraphQLScalarType;
+  File?: FileResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   PostAuthor?: PostAuthorResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  SimpleResponse?: GraphQLScalarType;
+  Upload?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
 };
 
@@ -428,6 +505,68 @@ export function useAddPostMutation(baseOptions?: Apollo.MutationHookOptions<AddP
 export type AddPostMutationHookResult = ReturnType<typeof useAddPostMutation>;
 export type AddPostMutationResult = Apollo.MutationResult<AddPostMutation>;
 export type AddPostMutationOptions = Apollo.BaseMutationOptions<AddPostMutation, AddPostMutationVariables>;
+export const DeleteFilesDocument = gql`
+    mutation deleteFiles($urls: [String]!) {
+  deleteFiles(urls: $urls)
+}
+    `;
+export type DeleteFilesMutationFn = Apollo.MutationFunction<DeleteFilesMutation, DeleteFilesMutationVariables>;
+
+/**
+ * __useDeleteFilesMutation__
+ *
+ * To run a mutation, you first call `useDeleteFilesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFilesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFilesMutation, { data, loading, error }] = useDeleteFilesMutation({
+ *   variables: {
+ *      urls: // value for 'urls'
+ *   },
+ * });
+ */
+export function useDeleteFilesMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFilesMutation, DeleteFilesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteFilesMutation, DeleteFilesMutationVariables>(DeleteFilesDocument, options);
+      }
+export type DeleteFilesMutationHookResult = ReturnType<typeof useDeleteFilesMutation>;
+export type DeleteFilesMutationResult = Apollo.MutationResult<DeleteFilesMutation>;
+export type DeleteFilesMutationOptions = Apollo.BaseMutationOptions<DeleteFilesMutation, DeleteFilesMutationVariables>;
+export const DeletePostDocument = gql`
+    mutation deletePost($_id: String!) {
+  deletePost(_id: $_id)
+}
+    `;
+export type DeletePostMutationFn = Apollo.MutationFunction<DeletePostMutation, DeletePostMutationVariables>;
+
+/**
+ * __useDeletePostMutation__
+ *
+ * To run a mutation, you first call `useDeletePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePostMutation, { data, loading, error }] = useDeletePostMutation({
+ *   variables: {
+ *      _id: // value for '_id'
+ *   },
+ * });
+ */
+export function useDeletePostMutation(baseOptions?: Apollo.MutationHookOptions<DeletePostMutation, DeletePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument, options);
+      }
+export type DeletePostMutationHookResult = ReturnType<typeof useDeletePostMutation>;
+export type DeletePostMutationResult = Apollo.MutationResult<DeletePostMutation>;
+export type DeletePostMutationOptions = Apollo.BaseMutationOptions<DeletePostMutation, DeletePostMutationVariables>;
 export const SendConfirmationEmailDocument = gql`
     mutation sendConfirmationEmail($_id: String!) {
   sendConfirmationEmail(_id: $_id)
@@ -559,6 +698,37 @@ export function useSignUpMutation(baseOptions?: Apollo.MutationHookOptions<SignU
 export type SignUpMutationHookResult = ReturnType<typeof useSignUpMutation>;
 export type SignUpMutationResult = Apollo.MutationResult<SignUpMutation>;
 export type SignUpMutationOptions = Apollo.BaseMutationOptions<SignUpMutation, SignUpMutationVariables>;
+export const SingleUploadDocument = gql`
+    mutation singleUpload($file: Upload!) {
+  singleUpload(file: $file)
+}
+    `;
+export type SingleUploadMutationFn = Apollo.MutationFunction<SingleUploadMutation, SingleUploadMutationVariables>;
+
+/**
+ * __useSingleUploadMutation__
+ *
+ * To run a mutation, you first call `useSingleUploadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSingleUploadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [singleUploadMutation, { data, loading, error }] = useSingleUploadMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useSingleUploadMutation(baseOptions?: Apollo.MutationHookOptions<SingleUploadMutation, SingleUploadMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SingleUploadMutation, SingleUploadMutationVariables>(SingleUploadDocument, options);
+      }
+export type SingleUploadMutationHookResult = ReturnType<typeof useSingleUploadMutation>;
+export type SingleUploadMutationResult = Apollo.MutationResult<SingleUploadMutation>;
+export type SingleUploadMutationOptions = Apollo.BaseMutationOptions<SingleUploadMutation, SingleUploadMutationVariables>;
 export const CurrentUserDocument = gql`
     query currentUser {
   currentUser {
@@ -660,6 +830,24 @@ declare module '*/addPost.ts' {
 }
     
 
+declare module '*/deleteFiles.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const deleteFiles: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
+declare module '*/deletePost.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const deletePost: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
 declare module '*/sendconfirmationemail.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
@@ -691,6 +879,15 @@ declare module '*/signup.ts' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const signUp: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
+declare module '*/singleUpload.ts' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const singleUpload: DocumentNode;
 
   export default defaultDocument;
 }
@@ -738,6 +935,16 @@ export const AddPost = gql`
   }
 }
     ${PostInfo}`;
+export const DeleteFiles = gql`
+    mutation deleteFiles($urls: [String]!) {
+  deleteFiles(urls: $urls)
+}
+    `;
+export const DeletePost = gql`
+    mutation deletePost($_id: String!) {
+  deletePost(_id: $_id)
+}
+    `;
 export const SendConfirmationEmail = gql`
     mutation sendConfirmationEmail($_id: String!) {
   sendConfirmationEmail(_id: $_id)
@@ -762,6 +969,11 @@ export const SignUp = gql`
   }
 }
     ${UserInfo}`;
+export const SingleUpload = gql`
+    mutation singleUpload($file: Upload!) {
+  singleUpload(file: $file)
+}
+    `;
 export const CurrentUser = gql`
     query currentUser {
   currentUser {

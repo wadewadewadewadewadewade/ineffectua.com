@@ -9,6 +9,8 @@ import {
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { EditorProps } from 'react-draft-wysiwyg';
+import { UPLOAD_FILE } from '../../graphql/mutations/singleUpload';
+import { useMutation } from '@apollo/client';
 
 const Editor = dynamic<EditorProps>(
   () => import('react-draft-wysiwyg').then(mod => mod.Editor),
@@ -32,17 +34,7 @@ export const RichText: React.FC<IRichText> = ({
   clearField,
   onImageUploaded,
 }) => {
-  const UploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('upload', file);
-    const response = await fetch('/api/images', {
-      method: 'POST',
-      body: formData,
-    });
-    const url = await response.text();
-    onImageUploaded(url);
-    return url;
-  };
+  const [uploadImage] = useMutation<{ singleUpload: string }>(UPLOAD_FILE);
 
   const translateDefaultValue = (v?: string) => {
     if (typeof v === 'string') {
@@ -71,12 +63,27 @@ export const RichText: React.FC<IRichText> = ({
     setEditorState(translateDefaultValue(defaultValue || ''));
   }, [defaultValue]);
   const uploadImageCallBack = async (file: File) => {
-    const imgData = await UploadImage(file);
-    return Promise.resolve({
-      data: {
-        link: imgData,
-      },
+    const imgData: string | false = await new Promise(resolve => {
+      uploadImage({
+        variables: { file },
+        onCompleted: ({ singleUpload }) => {
+          if (singleUpload.startsWith('http')) {
+            onImageUploaded(singleUpload);
+            resolve(singleUpload);
+          } else {
+            console.error(singleUpload);
+            resolve(false);
+          }
+        },
+      });
     });
+    if (imgData) {
+      return {
+        data: {
+          link: imgData,
+        },
+      };
+    }
   };
   return (
     <>

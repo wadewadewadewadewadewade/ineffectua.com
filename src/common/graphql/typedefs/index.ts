@@ -34,10 +34,18 @@ const typeDefs: Config['typeDefs'] = gql`
   type Query {
     currentUser: User
     getPosts(skip: Int, inReplyTo: String, userId: String): [Post]!
+    otherFields: Boolean!
   }
 
   scalar SimpleResponse
 
+  scalar Upload
+
+  type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
   type Mutation {
     signIn(email: String!, password: String!): User
     signUp(
@@ -50,6 +58,8 @@ const typeDefs: Config['typeDefs'] = gql`
     sendConfirmationEmail(_id: String!): Boolean
     addPost(body: String!, inReplyTo: String): Post
     deletePost(_id: String!): SimpleResponse
+    singleUpload(file: Upload!): String!
+    deleteFiles(urls: [String]!): Boolean
   }
 `;
 

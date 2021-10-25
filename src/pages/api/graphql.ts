@@ -6,6 +6,7 @@ import resolvers from '../../common/graphql/resolvers';
 import context from '../../common/graphql/context';
 import withCookies from '../../common/graphql/helpers/withCookies';
 import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
 handler.use(mongodb);
@@ -35,6 +36,6 @@ const startApolloServer = async (
   apolloServer.createHandler({ path: '/api/graphql' })(req, res);
 };
 
-handler.use(startApolloServer);
+handler.use(startApolloServer).use(graphqlUploadExpress);
 
 export default withCookies(handler);

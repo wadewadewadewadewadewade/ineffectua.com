@@ -1,6 +1,7 @@
 import Query from './queries';
 import Mutation from './mutations';
 import { GraphQLScalarType, Kind } from 'graphql';
+import { GraphQLUpload } from 'graphql-upload';
 
 const dateScalar = new GraphQLScalarType({
   name: 'Date',
@@ -35,6 +36,7 @@ const simpleResponseScalar = new GraphQLScalarType({
 export default {
   Date: dateScalar,
   SimpleResponse: simpleResponseScalar,
+  Upload: GraphQLUpload,
   Query,
   Mutation,
 };
