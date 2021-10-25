@@ -21,8 +21,20 @@ const dateScalar = new GraphQLScalarType({
   },
 });
 
+const simpleResponseScalar = new GraphQLScalarType({
+  name: 'SimpleResponse',
+  description: 'A custom response scalar type',
+  serialize(value: string | true) {
+    return value;
+  },
+  parseValue(value: string | true) {
+    return value;
+  },
+});
+
 export default {
   Date: dateScalar,
+  SimpleResponse: simpleResponseScalar,
   Query,
   Mutation,
 };

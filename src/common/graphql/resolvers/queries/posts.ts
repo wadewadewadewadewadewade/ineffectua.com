@@ -21,8 +21,8 @@ export const getPosts = async (
   const db = await ineffectuaDb();
   const databasePosts = await db
     .collection<IPost>('posts')
-    .find({ ..._args, isDeleted: undefined }, PostProjection)
-    .sort({ created: -1 })
+    .find({ ..._args, deletedAt: { $exists: false } }, PostProjection)
+    .sort({ createdAt: -1 })
     .toArray();
   const posts: IPost[] = [];
   await getUsersForPosts(databasePosts, posts);

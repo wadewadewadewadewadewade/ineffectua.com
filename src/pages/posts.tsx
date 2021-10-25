@@ -26,6 +26,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     data: { getPosts: posts },
   } = await client.query<{ getPosts: IPost[] }>({
     query: GET_POSTS,
+    variables: { inReplyTo: null },
     context,
   });
   return {

@@ -45,20 +45,32 @@ export const AddPost: React.FC<IAddPost> = props => {
   const userContext = useContext(AuthenticationContext);
   const isUserLoading = userContext === true;
   const [body, setBody] = useState<string>();
+  const [replies, setReplies] = useState(passedReplies || []);
   const [showReplies, setShowReplies] = useState(
-    passedReplies && passedReplies.length > 0,
+    (passedReplies && passedReplies.length > 0) || !addNewPostOnly,
   );
-  const [addPost, { loading: addPostLoading }] = useMutation<IPost | string>(
-    ADD_POST,
-    { refetchQueries: [{ query: GET_POSTS, variables: { inReplyTo } }] },
+  const [addPost, { loading: addPostLoading }] = useMutation<{
+    addPost: IPost | string;
+  }>(ADD_POST, {
+    refetchQueries: [{ query: GET_POSTS, variables: { inReplyTo } }],
+    onCompleted: ({ addPost }) => {
+      if (!onPost && typeof addPost !== 'string') {
+        setReplies(prevState => [addPost, ...prevState]);
+      }
+    },
+  });
+  console.log(
+    { passedReplies, inReplyTo, replies },
+    !!passedReplies || !inReplyTo,
   );
-  const { data: replies, loading: repliesLoading } = useQuery<
-    IPost[] | undefined
-  >(GET_POSTS, {
+  const { loading: repliesLoading } = useQuery<{
+    getPosts: IPost[] | undefined;
+  }>(GET_POSTS, {
     variables: {
       inReplyTo,
     },
     skip: !!passedReplies || !inReplyTo,
+    onCompleted: ({ getPosts }) => !passedReplies && setReplies(getPosts),
   });
   const loading = addPostLoading || repliesLoading;
   const imagesRef = useRef<string[]>([]);
@@ -99,10 +111,10 @@ export const AddPost: React.FC<IAddPost> = props => {
     // then post
     addPost({
       variables: { ...data, ...(inReplyTo ? { inReplyTo } : {}) },
-      onCompleted: result => {
-        if (typeof result !== 'string' && props.replies) {
+      onCompleted: ({ addPost: addPostResponse }) => {
+        if (typeof addPostResponse !== 'string' && props.replies) {
           // if replies are passed in, update that list here because onPost won't update that
-          onPost && onPost(result);
+          onPost && onPost(addPostResponse);
           setShowReplies(true);
         }
       },
@@ -188,7 +200,16 @@ export const AddPost: React.FC<IAddPost> = props => {
           timeout='auto'
           sx={{ paddingLeft: 1, paddingRight: 1 }}
         >
-          {showReplies && <PostMasonry posts={replies || []} />}
+          {showReplies && (
+            <PostMasonry
+              posts={replies || []}
+              onDelete={_id => {
+                setReplies(prevState =>
+                  prevState.filter(post => post._id !== _id),
+                );
+              }}
+            />
+          )}
         </Collapse>
       )}
     </Card>

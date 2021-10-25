@@ -7,11 +7,13 @@ export interface IAddPost {
   inReplyTo?: IPost['_id'];
 }
 
+export type TAddPostResponse = IPost | string;
+
 export async function addPost(
   _,
   _data: IAddPost,
   _context: { user: IUserProjection },
-) {
+): Promise<TAddPostResponse> {
   const { user } = _context;
   if (user) {
     const { inReplyTo, body } = _data;

@@ -36,6 +36,8 @@ const typeDefs: Config['typeDefs'] = gql`
     getPosts(skip: Int, inReplyTo: String, userId: String): [Post]!
   }
 
+  scalar SimpleResponse
+
   type Mutation {
     signIn(email: String!, password: String!): User
     signUp(
@@ -47,6 +49,7 @@ const typeDefs: Config['typeDefs'] = gql`
     signOut: Boolean
     sendConfirmationEmail(_id: String!): Boolean
     addPost(body: String!, inReplyTo: String): Post
+    deletePost(_id: String!): SimpleResponse
   }
 `;
 

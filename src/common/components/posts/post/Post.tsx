@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { IPostWithReplies } from '../../../types/IPost';
 import { Parser } from 'html-to-react';
-import fetchJson, { EApiEndpoints } from '../../../utils/fetcher';
 import {
   Box,
   Button,
@@ -18,6 +17,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddPost from '../AddPost';
 import ExpandMore from '../../ExpandMore';
 import { styled } from '@mui/material/styles';
+import { DELETE_POST } from '../../../graphql/mutations/deletePost';
+import { useMutation } from '@apollo/client';
+import { TDeletePostResponse } from '../../../graphql/resolvers/mutations/deletePost';
 
 const StyledTypography = styled(Typography)(() => ({
   img: {
@@ -31,21 +33,22 @@ export interface IPostProps {
 }
 
 export const Post: React.FC<IPostProps> = ({ post, onDelete }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [deletePost, { loading }] = useMutation<{
+    deletePost: TDeletePostResponse;
+  }>(DELETE_POST, {
+    variables: { _id: post._id },
+    onCompleted: ({ deletePost }) => {
+      typeof deletePost !== 'string' && onDelete && onDelete(post._id);
+    },
+  });
   const [showReplies, setShowReplies] = useState(false);
-  const onDeleteHandler = async () => {
-    setIsLoading(true);
-    await fetchJson('DELETE', EApiEndpoints.POST, post._id);
-    setIsLoading(false);
-    onDelete && onDelete(post._id);
-  };
   return post.body ? (
     <Card id={`post_${post._id}`}>
       <CardContent sx={{ position: 'relative' }}>
         <Fade
-          in={isLoading}
+          in={loading}
           style={{
-            transitionDelay: isLoading ? '800ms' : '0ms',
+            transitionDelay: loading ? '800ms' : '0ms',
           }}
           unmountOnExit
         >
@@ -67,7 +70,11 @@ export const Post: React.FC<IPostProps> = ({ post, onDelete }) => {
           </Box>
         </Fade>
         <Typography color='text.secondary' gutterBottom component='time'>
-          {post.created}
+          {typeof post.createdAt === 'string'
+            ? new Date(parseInt(post.createdAt, 10)).toLocaleString('en-US')
+            : typeof post.createdAt === 'number'
+            ? new Date(post.createdAt).toLocaleString('en-US')
+            : post.createdAt.toLocaleString('en-US')}
         </Typography>
         <StyledTypography as='div'>
           {new Parser().parse(post.body)}
@@ -80,11 +87,11 @@ export const Post: React.FC<IPostProps> = ({ post, onDelete }) => {
         >
           {showReplies && (
             <Button
-              disabled={isLoading}
+              disabled={loading}
               onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
-                onDeleteHandler();
+                deletePost();
               }}
               type='button'
             >
