@@ -24,6 +24,7 @@ interface IFormData {
 }
 
 interface IAddPost {
+  addNewPostOnly?: boolean;
   replies?: IPostWithReplies[];
   inReplyTo?: IPostWithReplies['_id'];
   onWillPost?: () => void;
@@ -31,7 +32,13 @@ interface IAddPost {
 }
 
 export const AddPost: React.FC<IAddPost> = props => {
-  const { inReplyTo, onWillPost, onPost, replies: passedReplies } = props;
+  const {
+    addNewPostOnly,
+    inReplyTo,
+    onWillPost,
+    onPost,
+    replies: passedReplies,
+  } = props;
   const userContext = useContext(AuthenticationContext);
   const isUserLoading = userContext === true;
   const [body, setBody] = useState<string>();
@@ -168,35 +175,39 @@ export const AddPost: React.FC<IAddPost> = props => {
             Post
           </Button>
           <Box sx={{ display: 'flex', flexGrow: 1 }}></Box>
-          <ExpandMore
-            expand={showReplies}
-            onClick={() => setShowReplies(prevState => !prevState)}
-            aria-expanded={showReplies}
-            aria-label='see replies'
-          >
-            <ExpandMoreIcon />
-          </ExpandMore>
+          {!addNewPostOnly && (
+            <ExpandMore
+              expand={showReplies}
+              onClick={() => setShowReplies(prevState => !prevState)}
+              aria-expanded={showReplies}
+              aria-label='see replies'
+            >
+              <ExpandMoreIcon />
+            </ExpandMore>
+          )}
         </Toolbar>
       </CardActions>
-      <Collapse
-        in={showReplies}
-        timeout='auto'
-        sx={{ paddingLeft: 1, paddingRight: 1 }}
-      >
-        {showReplies && (
-          <PostMasonry
-            posts={replies || []}
-            onDelete={
-              props.replies
-                ? _id =>
-                    setReplies(prevState =>
-                      prevState.filter(post => post._id !== _id),
-                    )
-                : undefined
-            }
-          />
-        )}
-      </Collapse>
+      {!addNewPostOnly && (
+        <Collapse
+          in={showReplies}
+          timeout='auto'
+          sx={{ paddingLeft: 1, paddingRight: 1 }}
+        >
+          {showReplies && (
+            <PostMasonry
+              posts={replies || []}
+              onDelete={
+                props.replies
+                  ? _id =>
+                      setReplies(prevState =>
+                        prevState.filter(post => post._id !== _id),
+                      )
+                  : undefined
+              }
+            />
+          )}
+        </Collapse>
+      )}
     </Card>
   );
 };

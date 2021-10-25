@@ -14,6 +14,7 @@ import { initApolloClient } from '../common/services/apollo';
 import { cookie, ICookieOptions } from '../common/graphql/helpers/withCookies';
 import { isAuthenticated } from '../common/graphql/context';
 import { ineffectuaDb } from '../common/utils/mongodb';
+import PostMasonry from '../common/components/posts/PostMasonry';
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const c = (name: string, value: string, options: ICookieOptions) =>
@@ -49,16 +50,18 @@ export function Home({
   const router = useRouter();
   const user: IUserProjection | false = deserealizeUser(serialzedUser);
   return (
-    <>
-      <RequireAuthentication user={user}>
-        <AddPost
-          onPost={() => {
-            router.replace(router.asPath);
-          }}
-          replies={posts}
-        />
-      </RequireAuthentication>
-    </>
+    <RequireAuthentication user={user}>
+      <AddPost
+        onPost={() => {
+          router.replace(router.asPath);
+        }}
+        addNewPostOnly={true}
+      />
+      <PostMasonry
+        posts={posts}
+        onDelete={() => router.replace(router.asPath)}
+      />
+    </RequireAuthentication>
   );
 }
 
