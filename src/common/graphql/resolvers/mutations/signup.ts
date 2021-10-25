@@ -89,7 +89,7 @@ export async function signUp(
   const cryptr = new Cryptr(secret);
   const encrypted = cryptr.encrypt(serealizeUser(user));
 
-  // the password is correct, set a cookie on the response
+  // Set a cookie on the response
   cookie('session', encrypted, {
     // cookie is valid for all subpaths of my domain
     path: '/',

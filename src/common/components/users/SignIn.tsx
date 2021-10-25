@@ -9,10 +9,12 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 import { SIGNIN } from '../../graphql/mutations/signin';
+import { IUserProjection } from '../../models/users/user';
+import { useRouter } from 'next/dist/client/router';
 
 interface IFormData {
   email: string;
@@ -25,6 +27,8 @@ interface ISignIn {
 }
 
 export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
+  const router = useRouter();
+  const [error, setError] = useState<string>(undefined);
   const {
     handleSubmit,
     control,
@@ -38,6 +42,12 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
   });
   const [handleSignin] = useMutation(SIGNIN, {
     refetchQueries: ['currentUser'],
+    onCompleted: (completed: IUserProjection | false) =>
+      completed
+        ? router.replace(router.asPath)
+        : setError(
+            'There was a problem signing you in with that email or password. Please try again.',
+          ),
   });
   const onSubmit = async (variables: IFormData) => {
     handleSignin({
@@ -99,6 +109,7 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
                           id='email'
                           type='email'
                           autoComplete='email'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -133,6 +144,7 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
                           id='password'
                           type='password'
                           autoComplete='password'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -147,6 +159,7 @@ export const SignIn: React.FC<ISignIn> = ({ onToggleAuthenticationMode }) => {
                 )}
               </FormControl>
             </FormGroup>
+            {!!error && <FormHelperText error>{error}</FormHelperText>}
           </FormControl>
         </Box>
         <Toolbar

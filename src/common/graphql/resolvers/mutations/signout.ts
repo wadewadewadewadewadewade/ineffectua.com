@@ -1,10 +1,16 @@
 import { TCookieMethod } from '../../helpers/withCookies';
 
-export function signOut(_, _args, ctx: { cookie: TCookieMethod }) {
+export function signOut(
+  _: Record<string, unknown>,
+  _args: Record<string, unknown>,
+  ctx: { cookie: TCookieMethod },
+) {
   const { cookie } = ctx;
 
-  // the password is correct, set a cookie on the response
+  // delete cookie on the response
   cookie('session', null, {
+    // delete the cookie
+    expires: new Date(Date.now() + -(1000 * 60)),
     // cookie is valid for all subpaths of my domain
     path: '/',
     // this cookie won't be readable by the browser

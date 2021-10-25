@@ -5,6 +5,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { SIGNOUT } from '../graphql/mutations/signout';
 import { GET_CURRENT_USER } from '../graphql/queries/currentUser';
 import { SEND_CONFIRMATION_EMAIL } from '../graphql/mutations/sendconfirmationemail';
+import { useRouter } from 'next/dist/client/router';
 
 export const AuthenticationContext = createContext<
   | (IUserProjection & {
@@ -20,8 +21,12 @@ export const AuthenticationContext = createContext<
 AuthenticationContext.displayName = 'Authentication';
 
 export const AuthenticationContextProvider: React.FC = ({ children }) => {
+  const router = useRouter();
   const { data, loading } = useQuery(GET_CURRENT_USER);
-  const [signOut] = useMutation(SIGNOUT);
+  const [signOut] = useMutation(SIGNOUT, {
+    refetchQueries: ['currentUser'],
+    onCompleted: () => router.replace(router.asPath),
+  });
   const confirmationResultsHandlerRef =
     useRef<(results: boolean) => void>(undefined);
   const [sendConfirmationEmail, mutationResults] = useMutation(
@@ -34,7 +39,6 @@ export const AuthenticationContextProvider: React.FC = ({ children }) => {
       confirmationResultsHandlerRef.current(false);
     }
   }
-  console.log({ data });
   const user =
     data && data.currentUser ? (data.currentUser as IUserProjection) : false;
   return (

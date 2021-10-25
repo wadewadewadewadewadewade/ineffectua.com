@@ -10,10 +10,12 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React from 'react';
+import { useRouter } from 'next/dist/client/router';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { SIGNUP } from '../../graphql/mutations/signup';
 import { ICreateUserUser } from '../../graphql/resolvers/mutations/signup';
+import { IUserProjection } from '../../models/users/user';
 
 interface IFormData extends ICreateUserUser {
   password_confirm: string;
@@ -24,6 +26,8 @@ interface ISignUp {
 }
 
 export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
+  const router = useRouter();
+  const [error, setError] = useState<string>(undefined);
   const {
     handleSubmit,
     control,
@@ -40,6 +44,12 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
   });
   const [handleSignup] = useMutation(SIGNUP, {
     refetchQueries: ['currentUser'],
+    onCompleted: (completed: IUserProjection | false) =>
+      completed
+        ? router.replace(router.asPath)
+        : setError(
+            'There was a problem signing you up with that email or password. Please try again.',
+          ),
   });
   const passwordConfirm = watch('password_confirm');
   const onSubmit = async (variables: IFormData) => {
@@ -93,6 +103,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='name'
                           type='text'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -122,6 +133,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                           id='username'
                           type='text'
                           autoComplete='username'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -155,6 +167,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                           id='email'
                           type='email'
                           autoComplete='email'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -189,6 +202,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                           id='password'
                           type='password'
                           autoComplete='new-password'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -221,6 +235,7 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                         <Input
                           id='password_confirm'
                           type='password'
+                          onFocus={() => error && setError(undefined)}
                           {...field}
                           sx={{ width: '100%' }}
                         />
@@ -235,6 +250,9 @@ export const SignUp: React.FC<ISignUp> = ({ onToggleAuthenticationMode }) => {
                 )}
               </FormControl>
             </FormGroup>
+            {!!errors.email && (
+              <FormHelperText error>{errors.email?.message}</FormHelperText>
+            )}
           </FormControl>
         </Box>
         <Toolbar
