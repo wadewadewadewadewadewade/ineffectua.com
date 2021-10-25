@@ -6,6 +6,8 @@ Includes [Material-UI](https://mui.com/) which relies on [Emotion](https://emoti
 
 ### TODO
 
+- get add/delete post mutations working
+- add in image upload mutation working
 - since user data is encoded into header, when that changes (like confirmation email sent), we need to update that header
 - change the Posts page so that the posts aren't hidden by default (but reply posts are)
 - wire in sendConfirmationEmail including new webhook
