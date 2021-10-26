@@ -47,6 +47,7 @@ export const deleteFiles = async (
               Objects: keys,
             },
           },
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           function (err, data) {
             if (err) {
               console.error(err);

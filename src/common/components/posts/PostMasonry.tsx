@@ -34,7 +34,7 @@ export const PostMasonry: React.FC<IPostMasonry> = ({ posts, onDelete }) => {
       return 4;
     }
   }, [isXs, isSm, isMd, isLg, isXl, postsLength]);
-  console.log({ posts });
+
   return (
     <Masonry columns={breakpointCols} spacing={1} aria-label='posts'>
       {posts.map((post, index) => (

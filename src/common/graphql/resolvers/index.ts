@@ -33,9 +33,21 @@ const simpleResponseScalar = new GraphQLScalarType({
   },
 });
 
+const stringOrArrayScalar = new GraphQLScalarType({
+  name: 'StringOrArray',
+  description: 'A custom response scalar type for string or array of strings',
+  serialize(value: string | string[]) {
+    return value;
+  },
+  parseValue(value: string | string[]) {
+    return value;
+  },
+});
+
 export default {
   Date: dateScalar,
   SimpleResponse: simpleResponseScalar,
+  StringOrArray: stringOrArrayScalar,
   Upload: GraphQLUpload,
   Query,
   Mutation,

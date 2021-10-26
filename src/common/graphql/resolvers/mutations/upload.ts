@@ -49,7 +49,9 @@ export const singleUpload = async (
   { file }: { file: Promise<FileUpload> },
   { user }: { user: IUserProjection | false },
 ): Promise<string> => {
+  console.log(Object.keys(await file));
   if (user) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { createReadStream, filename, mimetype, encoding } = await file;
     const path = `${user._id}/${Date.now().toString()}/`;
     const response = await saveFile(createReadStream, `${path}${filename}`, '');
@@ -57,6 +59,35 @@ export const singleUpload = async (
       return `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${path}${filename}`;
     }
     return response;
+  }
+  return 'Please authenticate in order to upload';
+};
+
+export const multipleUpload = async (
+  parent: Record<string, unknown>,
+  { files }: { files: Promise<FileUpload[]> },
+  { user }: { user: IUserProjection | false },
+): Promise<string[] | string> => {
+  if (user) {
+    const timestamp = Date.now().toString();
+    const urlPromises = (await files).map(
+      async (file: FileUpload): Promise<string> => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { createReadStream, filename, mimetype, encoding } = file;
+        const path = `${user._id}/${timestamp}/`;
+        const response = await saveFile(
+          createReadStream,
+          `${path}${filename}`,
+          '',
+        );
+        if (typeof response !== 'string') {
+          return `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${path}${filename}`;
+        }
+        return response;
+      },
+    );
+    const urls = await Promise.all(urlPromises);
+    return urls;
   }
   return 'Please authenticate in order to upload';
 };

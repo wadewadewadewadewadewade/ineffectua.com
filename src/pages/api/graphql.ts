@@ -8,8 +8,21 @@ import withCookies from '../../common/graphql/helpers/withCookies';
 import mongodb, { INextApiRequestWithDB } from '../../common/utils/mongodb';
 import { graphqlUploadExpress } from 'graphql-upload';
 
-const handler = nextConnect<INextApiRequestWithDB, NextApiResponse>();
-handler.use(mongodb);
+const handler = nextConnect<
+  INextApiRequestWithDB & { is: (type: string) => boolean },
+  NextApiResponse
+>();
+handler
+  .use(mongodb)
+  .use((req, res, next) => {
+    req.is = ctype => req.headers['content-type'].includes(ctype);
+    next();
+  })
+  .use(
+    graphqlUploadExpress({
+      maxFileSize: 10000000,
+    }),
+  );
 
 const apolloServer = new ApolloServer({
   typeDefs,
@@ -36,6 +49,6 @@ const startApolloServer = async (
   apolloServer.createHandler({ path: '/api/graphql' })(req, res);
 };
 
-handler.use(startApolloServer).use(graphqlUploadExpress);
+handler.use(startApolloServer);
 
 export default withCookies(handler);

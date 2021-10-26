@@ -9,6 +9,7 @@ import {
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import schema from '../graphql/schema';
+import { SchemaLink } from '@apollo/client/link/schema';
 
 // ensure that queries can run on the server during SSR and SSG
 //global.fetch = require('node-fetch');
@@ -23,8 +24,6 @@ function createIsomorphLink() {
   if (typeof window === 'undefined') {
     // These have to imported dynamically, instead of at the root of the page,
     // in order to make sure that we're not shipping server-side code to the client
-    // eslint-disable-next-line
-    const { SchemaLink } = require('@apollo/link-schema');
     return new SchemaLink({
       schema,
       context: { db: ineffectuaDb, cookie: null, user: false },
@@ -32,6 +31,9 @@ function createIsomorphLink() {
   } else {
     return new HttpLink({
       uri,
+      headers: {
+        'keep-alive': 'true',
+      },
     });
   }
 }

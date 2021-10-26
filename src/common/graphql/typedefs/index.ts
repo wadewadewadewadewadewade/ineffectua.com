@@ -39,6 +39,8 @@ const typeDefs: Config['typeDefs'] = gql`
 
   scalar SimpleResponse
 
+  scalar StringOrArray
+
   scalar Upload
 
   type File {
@@ -46,6 +48,7 @@ const typeDefs: Config['typeDefs'] = gql`
     mimetype: String!
     encoding: String!
   }
+
   type Mutation {
     signIn(email: String!, password: String!): User
     signUp(
@@ -59,6 +62,7 @@ const typeDefs: Config['typeDefs'] = gql`
     addPost(body: String!, inReplyTo: String): Post
     deletePost(_id: String!): SimpleResponse
     singleUpload(file: Upload!): String!
+    multipleUpload(files: [Upload]!): String!
     deleteFiles(urls: [String]!): Boolean
   }
 `;

@@ -4,7 +4,7 @@ import { signUp } from './signup';
 import { sendConfirmationEmail } from './sendconfirmationemail';
 import { addPost } from './addPost';
 import { deletePost } from './deletePost';
-import { singleUpload } from './singleUpload';
+import { singleUpload, multipleUpload } from './upload';
 import { deleteFiles } from './deleteFiles';
 
 export default {
@@ -15,5 +15,6 @@ export default {
   addPost,
   deletePost,
   singleUpload,
+  multipleUpload,
   deleteFiles,
 };
